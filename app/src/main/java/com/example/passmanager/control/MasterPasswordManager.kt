@@ -3,7 +3,10 @@ package com.example.passmanager.control
 import com.example.passmanager.dal.Storage
 import com.example.passmanager.dal.domain.MasterPasswordDO
 import com.example.passmanager.dal.dto.MasterPasswordDT
+import com.example.passmanager.dal.loadFromFile
 import com.example.passmanager.dal.mapper.MasterPasswordMapper
+import com.example.passmanager.dal.saveToFile
+import java.io.File
 
 class MasterPasswordManager (
     private val storageManager: Storage<MasterPasswordDT>
@@ -24,5 +27,9 @@ class MasterPasswordManager (
 
     private fun hash(password: String): String {
         return password.hashCode().toString()
+    }
+
+    fun saveMPToFile(file: File) {
+        saveToFile(file, storageManager.retrieveAll())
     }
 }

@@ -4,6 +4,10 @@ import com.example.passmanager.dal.Storage
 import com.example.passmanager.dal.domain.CredentialDO
 import com.example.passmanager.dal.dto.CredentialDT
 import com.example.passmanager.dal.mapper.CredentialMapper
+import com.example.passmanager.dal.saveToFile
+import com.example.passmanager.dal.loadFromFile
+import java.io.File
+
 
 class CredentialsManager (
     private val storage: Storage<CredentialDT>
@@ -31,5 +35,9 @@ class CredentialsManager (
 
     fun updatePassword(platform: String, email: String, newPassword: String): Boolean {
         return storage.update(CredentialDT(platform, email, newPassword))
+    }
+
+    fun saveCredToFile(file: File) {
+        saveToFile<CredentialDT>(file, storage.retrieveAll())
     }
 }

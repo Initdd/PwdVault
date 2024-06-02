@@ -4,6 +4,8 @@ import com.example.passmanager.dal.Storage
 import com.example.passmanager.dal.domain.ThemeModeDO
 import com.example.passmanager.dal.dto.ThemeModeDT
 import com.example.passmanager.dal.mapper.ThemeModeMapper
+import com.example.passmanager.dal.saveToFile
+import java.io.File
 
 /**
  * The ThemeManager class is responsible for managing the theme settings of the application
@@ -12,11 +14,18 @@ import com.example.passmanager.dal.mapper.ThemeModeMapper
 class ThemeModeManager(
     private val storage: Storage<ThemeModeDT>
 ) {
+
+    val defaultTheme = ThemeModeDO.LIGHT
+
     /**
      * Get the current theme mode.
      */
     fun getTheme(): ThemeModeDO {
-        return ThemeModeMapper.toDomain(storage.retrieveAll().first())
+        return try {
+            ThemeModeMapper.toDomain(storage.retrieveAll().first())
+        } catch (e: NoSuchElementException) {
+            defaultTheme
+        }
     }
 
     /**
@@ -24,5 +33,12 @@ class ThemeModeManager(
      */
     fun setTheme(theme: ThemeModeDO) {
         storage.store(ThemeModeMapper.toDto(theme))
+    }
+
+    /**
+     * Save to file
+     */
+    fun saveTMToFile(file: File) {
+        saveToFile(file, storage.retrieveAll())
     }
 }
