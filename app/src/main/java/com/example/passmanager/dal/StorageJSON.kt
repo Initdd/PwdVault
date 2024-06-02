@@ -21,7 +21,6 @@ inline fun <reified T> saveToFile(file: File, data: List<T>) {
 }
 
 class StorageJSON<E>(
-    private val file: File,
     private val compare: (E, E) -> Boolean
 ) : Storage<E> {
     var storage: MutableList<E> = mutableListOf()
@@ -74,6 +73,10 @@ class StorageJSON<E>(
             return true
         }
         return false
+    }
+
+    fun load(data: List<E>) {
+        storage = data.toMutableList()
     }
 
 }
