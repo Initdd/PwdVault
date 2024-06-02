@@ -1,8 +1,15 @@
 package com.example.passmanager
 
 import android.annotation.SuppressLint
+import android.app.ActionBar
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
+import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -46,6 +53,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,11 +61,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.core.content.ContextCompat.startActivity
 import com.example.passmanager.control.CredentialsManager
 import com.example.passmanager.control.MasterPasswordManager
 import com.example.passmanager.control.ThemeModeManager
 import com.example.passmanager.dal.StorageJSON
 import com.example.passmanager.dal.domain.CredentialDO
+import com.example.passmanager.dal.domain.ThemeModeDO
 import com.example.passmanager.dal.dto.CredentialDT
 import com.example.passmanager.dal.dto.MasterPasswordDT
 import com.example.passmanager.dal.dto.ThemeModeDT
@@ -65,6 +75,7 @@ import com.example.passmanager.dal.dto.compareCredentialDT
 import com.example.passmanager.dal.dto.compareMasterPasswordDT
 import com.example.passmanager.dal.dto.compareThemeModeDT
 import com.example.passmanager.dal.loadFromFile
+import com.example.passmanager.dal.mapper.CredentialMapper
 import com.example.passmanager.dal.saveToFile
 import com.example.passmanager.ui.theme.PassManagerTheme
 import java.io.File
@@ -84,6 +95,10 @@ lateinit var masterPasswordStorage: StorageJSON<MasterPasswordDT>
 lateinit var themeModeManager: ThemeModeManager
 lateinit var masterPasswordManager: MasterPasswordManager
 lateinit var credentialsManager: CredentialsManager
+
+// Global
+lateinit var credentialsList: MutableState<List<CredentialDO>>
+lateinit var themeMode: MutableState<ThemeModeDO>
 
 class MainActivity : ComponentActivity() {
 
@@ -110,27 +125,14 @@ class MainActivity : ComponentActivity() {
         }
 
         // Storages
-        credentialStorage = StorageJSON(
-            credentialFile,
-        ) { a, b ->
-            compareCredentialDT(a, b)
-        }
-        themeStorage = StorageJSON(
-            themeFile,
-        ) { a, b ->
-            compareThemeModeDT(a, b)
-        }
-        masterPasswordStorage = StorageJSON(
-            masterPasswordFile,
-        ) { a, b ->
-            compareMasterPasswordDT(a, b)
-        }
+        credentialStorage = StorageJSON { a, b -> compareCredentialDT(a, b)}
+        themeStorage = StorageJSON { a, b ->compareThemeModeDT(a, b)}
+        masterPasswordStorage = StorageJSON { a, b ->compareMasterPasswordDT(a, b)}
 
         // Load data from files
-        credentialStorage.storage = loadFromFile<CredentialDT>(credentialFile).toMutableList()
-        loadFromFile<ThemeModeDT>(themeFile)
-        loadFromFile<MasterPasswordDT>(masterPasswordFile)
-
+        credentialStorage.load(loadFromFile<CredentialDT>(credentialFile))
+        themeStorage.load(loadFromFile<ThemeModeDT>(themeFile))
+        masterPasswordStorage.load(loadFromFile<MasterPasswordDT>(masterPasswordFile))
 
         // Theme
         themeModeManager = ThemeModeManager(themeStorage)
@@ -146,9 +148,9 @@ class MainActivity : ComponentActivity() {
 
     // execute on exit
     private fun exit() {
-        saveToFile<CredentialDT>(credentialFile, credentialStorage.retrieveAll())
-        saveToFile<ThemeModeDT>(themeFile, themeStorage.retrieveAll())
-        saveToFile<MasterPasswordDT>(masterPasswordFile, masterPasswordStorage.retrieveAll())
+        credentialsManager.saveCredToFile(credentialFile)
+        themeModeManager.saveTMToFile(themeFile)
+        masterPasswordManager.saveMPToFile(masterPasswordFile)
     }
 
     // On app closed
@@ -179,16 +181,23 @@ fun PassManagerApp() {
 
     val showAddPassPopup = remember { mutableStateOf(false) }
 
-    PassManagerTheme {
+    credentialsList = remember { mutableStateOf(credentialsManager.getAll()) }
+
+    themeMode = remember { mutableStateOf(themeModeManager.getTheme()) }
+    println(themeMode.value)
+
+    PassManagerTheme(
+        darkTheme = themeMode.value == ThemeModeDO.DARK
+    ) {
         Scaffold(modifier = Modifier.fillMaxSize()) {
             Column(
-                modifier = Modifier
+                modifier = Modifier 
                     .fillMaxSize()
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Top
             ) {
-                TopBar()
-                ItemList(credentialsManager.getAll())
+                TopBar(LocalContext.current)
+                ItemList(credentialsList.value)
                 AddButton(showAddPassPopup)
                 if (showAddPassPopup.value) {
                     AddPassPopup(showAddPassPopup)
@@ -233,7 +242,7 @@ fun AddPassPopup(showAddPassPopup: MutableState<Boolean>) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(itemPadding*2),
+                    .padding(itemPadding * 2),
                 verticalArrangement = Arrangement.Center
             ) {
                 OutlinedTextField(
@@ -400,13 +409,6 @@ fun ItemList(list: List<CredentialDO> = emptyList()) {
             list.forEach {
                 PwdItem(it.platform, it.email, it.password)
             }
-//            PwdItem("Facebook", "test@test.com", "password")
-//            PwdItem("Facebook", "test@test.com", "password")
-//            PwdItem("Facebook", "test@test.com", "password")
-//            PwdItem("Facebook", "test@test.com", "password")
-//            PwdItem("Facebook", "test@test.com", "password")
-//            PwdItem("Facebook", "test@test.com", "password")
-//            PwdItem("Facebook", "test@test.com", "password")
         }
     }
 }
@@ -592,8 +594,10 @@ fun PwdItem(platform: String, email: String, password: String = "", ) {
 }
 
 @Composable
-fun TopBar() {
+fun TopBar(ctx: Context) {
+
     val text = remember { mutableStateOf("") }
+
     Box (
         modifier = Modifier
             .padding(16.dp)
@@ -606,8 +610,12 @@ fun TopBar() {
         ) {
             OutlinedTextField(
                 value = text.value,
-                onValueChange = {
-                    text.value = it
+                onValueChange = {textValue ->
+                    text.value = textValue
+                    credentialsList.value = credentialsManager.getAll().filter {
+                        it.platform.contains(text.value, ignoreCase = true) ||
+                                it.email.contains(text.value, ignoreCase = true)
+                    }
                 },
                 label = { Text("Search") },
                 modifier = Modifier
@@ -615,10 +623,15 @@ fun TopBar() {
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.secondary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                )
+                ),
+                maxLines = 1,
             )
             IconButton(
-                onClick = { /* Handle menu button click */ },
+                onClick = {
+                    // Start settings activity
+                    val intent = Intent(ctx, SettingsActivity::class.java)
+                    startActivity(ctx, intent, null)
+                },
                 colors = IconButtonDefaults.iconButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary
                 )
