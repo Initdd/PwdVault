@@ -3,20 +3,20 @@ package com.example.passmanager.control
 import com.example.passmanager.dal.Storage
 import com.example.passmanager.dal.domain.MasterPasswordDO
 import com.example.passmanager.dal.dto.MasterPasswordDT
-import com.example.passmanager.dal.loadFromFile
 import com.example.passmanager.dal.mapper.MasterPasswordMapper
 import com.example.passmanager.dal.saveToFile
 import java.io.File
 
 class MasterPasswordManager (
-    private val storageManager: Storage<MasterPasswordDT>
+    private val storageManager: Storage<Int, MasterPasswordDT>,
+    private val file: File
 ) {
 
     fun set(masterPasswordDO: MasterPasswordDO) {
         // Hash the password before storing it
         // ? Currently mapping from domain to dto and then storing the dto. Can change that later
         val encryptedPassword = masterPasswordDO.copy(password = hash(masterPasswordDO.password))
-        storageManager.store(MasterPasswordMapper.toDto(encryptedPassword))
+        storageManager.update(0, MasterPasswordMapper.toDTO(encryptedPassword))
     }
 
     fun get(): MasterPasswordDO {
@@ -29,7 +29,7 @@ class MasterPasswordManager (
         return password.hashCode().toString()
     }
 
-    fun saveMPToFile(file: File) {
+    fun saveMPToFile() {
         saveToFile(file, storageManager.retrieveAll())
     }
 }

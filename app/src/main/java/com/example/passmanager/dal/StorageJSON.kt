@@ -18,13 +18,28 @@ inline fun <reified T> loadFromFile(file: File): List<T> {
 inline fun <reified T> saveToFile(file: File, data: List<T>) {
     val content = Json.encodeToString<List<T>>(data)
     file.writeText(content)
+    println("Data saved to file:\n$content")
 }
 
+/**
+ * Storage Interface
+ *
+ * This interface defines the methods that a storage class must implement.
+ * The storage class is responsible for storing and retrieving data from the storage medium.
+ *
+ */
 class StorageJSON<E>(
     private val compare: (E, E) -> Boolean
-) : Storage<E> {
+) : Storage<Int, E> {
     var storage: MutableList<E> = mutableListOf()
 
+    /**
+     * Store data in the storage list.
+     *
+     * @param data The data to be stored.
+     * @return True if the data was successfully stored, false otherwise.
+     * If the data is already stored, return false.
+     */
     override fun store(data: E): Boolean {
         if (storage.any { compare(it, data) }) {
             return false
@@ -33,25 +48,31 @@ class StorageJSON<E>(
         return true
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun retrieve(key: E?): E? {
-        // If the key is null, return all the data
-        if (key == null) {
-            return storage as E
-        }
-        return storage.find {
-            compare(it, key)
-        } as E
-    }
+    /**
+     * Retrieve data from the storage list.
+     *
+     * @param key The key to search for in the storage list.
+     * @return The data stored under the given key, or null if the key does not exist.
+     */
+    override fun retrieve(key: Int): E? = storage[key]
 
+    /**
+     * Retrieve all data from the storage list.
+     *
+     * @return A list containing all the data stored in the storage list.
+     */
     override fun retrieveAll(): List<E> {
         return storage
     }
 
-    override fun delete(key: E): Boolean {
-        val item = storage.find {
-            compare(it, key)
-        }
+    /**
+     * Delete data from the storage list.
+     *
+     * @param key The key to search for in the storage list.
+     * @return True if the data was successfully deleted, false otherwise.
+     */
+    override fun delete(key: Int): Boolean {
+        val item = storage[key]
         if (item != null) {
             storage.remove(item)
             return true
@@ -59,22 +80,33 @@ class StorageJSON<E>(
         return false
     }
 
+    /**
+     * Delete all data from the storage list.
+     */
     override fun deleteAll() {
         storage.clear()
     }
 
-    override fun update(key: E): Boolean {
-        val item = storage.find {
-            compare(it, key)
-        }
-        if (item != null) {
-            storage.remove(item)
-            storage.add(key)
+    /**
+     * Update data in the storage list.
+     *
+     * @param key The key to search for in the storage list.
+     * @param data The new data to be stored.
+     * @return True if the data was successfully updated, false otherwise.
+     */
+    override fun update(key: Int, data: E): Boolean {
+        if (storage[key] != null) {
+            storage[key] = data
             return true
         }
         return false
     }
 
+    /**
+     * Load data into the storage list.
+     *
+     * @param data The data to load into the storage list.
+     */
     fun load(data: List<E>) {
         storage = data.toMutableList()
     }

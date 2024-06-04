@@ -8,15 +8,14 @@ package com.example.passmanager.dal
  *
  *
  */
-interface Storage<E> {
+interface Storage<K, V> {
     /**
      * Store data in the storage medium.
      *
-     * @param key The key under which the data will be stored.
      * @param data The data to be stored.
      * @return True if the data was successfully stored, false otherwise.
      */
-    fun store(data: E): Boolean
+    fun store(data: V): Boolean
 
     /**
      * Retrieve data from the storage medium.
@@ -28,7 +27,7 @@ interface Storage<E> {
      * @param key The key under which the data is stored.
      * @return The data stored under the given key, or null if the key does not exist.
      */
-    fun retrieve(key: E?): E?
+    fun retrieve(key: K): V?
 
     /**
      * Get all data from the storage medium.
@@ -37,7 +36,7 @@ interface Storage<E> {
      *
      * @return A list containing all the data stored in the storage medium.
      */
-    fun retrieveAll(): List<E>
+    fun retrieveAll(): List<V>
 
     /**
      * Delete data from the storage medium.
@@ -48,7 +47,7 @@ interface Storage<E> {
      * @param key The key under which the data is stored.
      * @return True if the data was successfully deleted, false otherwise.
      */
-    fun delete(key: E): Boolean
+    fun delete(key: K): Boolean
 
     /**
      * Delete all data from the storage medium.
@@ -64,9 +63,9 @@ interface Storage<E> {
      * If the key does not exist, false is returned.
      *
      * @param key The key under which the data is stored.
-     * @param data The data to be updated.
+     * @param data The new data to be stored.
      * @return True if the data was successfully updated, false otherwise.
      */
-    fun update(key: E): Boolean
+    fun update(key: K, data: V): Boolean
 
 }

@@ -12,10 +12,11 @@ import java.io.File
  * In other words, dark mode or light mode.
  */
 class ThemeModeManager(
-    private val storage: Storage<ThemeModeDT>
+    private val storage: Storage<Int, ThemeModeDT>,
+    private val file: File
 ) {
 
-    val defaultTheme = ThemeModeDO.LIGHT
+    private val defaultTheme = ThemeModeDO.LIGHT
 
     /**
      * Get the current theme mode.
@@ -32,13 +33,17 @@ class ThemeModeManager(
      * Set the theme mode.
      */
     fun setTheme(theme: ThemeModeDO) {
-        storage.store(ThemeModeMapper.toDto(theme))
+        try{
+            storage.update(0, ThemeModeMapper.toDTO(theme))
+        } catch (e: IndexOutOfBoundsException) {
+            storage.store(ThemeModeMapper.toDTO(theme))
+        }
     }
 
     /**
      * Save to file
      */
-    fun saveTMToFile(file: File) {
+    fun saveTMToFile() {
         saveToFile(file, storage.retrieveAll())
     }
 }
