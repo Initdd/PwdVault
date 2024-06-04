@@ -12,7 +12,7 @@ object CredentialMapper {
         )
     }
 
-    fun toDto(domain: CredentialDO): CredentialDT {
+    fun toDTO(domain: CredentialDO): CredentialDT {
         return CredentialDT(
             platform = domain.platform,
             email = domain.email,

@@ -10,7 +10,7 @@ object MasterPasswordMapper {
         )
     }
 
-    fun toDto(domain: MasterPasswordDO): MasterPasswordDT {
+    fun toDTO(domain: MasterPasswordDO): MasterPasswordDT {
         return MasterPasswordDT(
             password = domain.password
         )

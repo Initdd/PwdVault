@@ -12,7 +12,7 @@ object ThemeModeMapper {
         }
     }
 
-    fun toDto(domain: ThemeModeDO): ThemeModeDT {
+    fun toDTO(domain: ThemeModeDO): ThemeModeDT {
         return ThemeModeDT(
             theme = when (domain) {
                 ThemeModeDO.LIGHT -> "LIGHT"
