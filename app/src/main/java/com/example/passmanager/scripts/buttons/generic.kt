@@ -1,4 +1,4 @@
-package com.example.passmanager.scripts
+package com.example.passmanager.scripts.buttons
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,52 +51,52 @@ fun MySwitch(
     uncheckedTrackColor: Color = Color(0xFFe0e0e0),
     gapBetweenThumbAndTrackEdge: Dp = 4.dp,
     onSwitchChange: (Boolean) -> Unit = {}
-    ) {
+) {
 
-        val switchON = remember {
-            mutableStateOf(true) // Initially the switch is ON
-        }
+    val switchON = remember {
+        mutableStateOf(true) // Initially the switch is ON
+    }
 
-        val thumbRadius = (height / 2) - gapBetweenThumbAndTrackEdge/2
+    val thumbRadius = (height / 2) - gapBetweenThumbAndTrackEdge/2
 
-        // To move thumb, we need to calculate the position (along x axis)
-        val animatePosition = animateFloatAsState(
-            targetValue = if (switchON.value)
-                with(LocalDensity.current) { (width - thumbRadius - gapBetweenThumbAndTrackEdge).toPx() }
-            else
-                with(LocalDensity.current) { (thumbRadius + gapBetweenThumbAndTrackEdge).toPx() }
-        )
+    // To move thumb, we need to calculate the position (along x axis)
+    val animatePosition = animateFloatAsState(
+        targetValue = if (switchON.value)
+            with(LocalDensity.current) { (width - thumbRadius - gapBetweenThumbAndTrackEdge).toPx() }
+        else
+            with(LocalDensity.current) { (thumbRadius + gapBetweenThumbAndTrackEdge).toPx() }
+    )
 
-        Canvas(
-            modifier = Modifier
-                .size(width = width, height = height)
-                .scale(scale = scale)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = {
-                            // This is called when the user taps on the canvas
-                            switchON.value = !switchON.value
-                            onSwitchChange(switchON.value)
-                        }
-                    )
-                },
+    Canvas(
+        modifier = Modifier
+            .size(width = width, height = height)
+            .scale(scale = scale)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        // This is called when the user taps on the canvas
+                        switchON.value = !switchON.value
+                        onSwitchChange(switchON.value)
+                    }
+                )
+            },
 
         ) {
-            // Track
-            drawRoundRect(
-                color = if (switchON.value) checkedTrackColor else uncheckedTrackColor,
-                cornerRadius = CornerRadius(x = 10.dp.toPx(), y = 10.dp.toPx()),
-                style = Stroke(width = strokeWidth.toPx()),
-            )
+        // Track
+        drawRoundRect(
+            color = if (switchON.value) checkedTrackColor else uncheckedTrackColor,
+            cornerRadius = CornerRadius(x = 10.dp.toPx(), y = 10.dp.toPx()),
+            style = Stroke(width = strokeWidth.toPx()),
+        )
 
-            // Thumb
-            drawCircle(
-                color = if (switchON.value) checkedTrackColor else uncheckedTrackColor,
-                radius = thumbRadius.toPx(),
-                center = Offset(
-                    x = animatePosition.value,
-                    y = size.height / 2
-                )
+        // Thumb
+        drawCircle(
+            color = if (switchON.value) checkedTrackColor else uncheckedTrackColor,
+            radius = thumbRadius.toPx(),
+            center = Offset(
+                x = animatePosition.value,
+                y = size.height / 2
             )
-        }
+        )
+    }
 }
