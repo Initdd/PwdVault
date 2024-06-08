@@ -32,7 +32,7 @@ import com.example.passmanager.credentialsManager
 
 
 @Composable
-fun AddPassPopup(showAddPassPopup: MutableState<Boolean>) {
+fun AddCredentialsPopup(showAddPassPopup: MutableState<Boolean>) {
     // Constants
     // Dimensions
     val padding = 32.dp

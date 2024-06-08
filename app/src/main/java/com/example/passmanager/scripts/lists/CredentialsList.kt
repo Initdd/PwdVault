@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -17,7 +18,7 @@ import com.example.passmanager.dal.domain.CredentialDO
 
 
 @Composable
-fun ItemList(list: List<CredentialDO> = emptyList()) {
+fun ItemList(list: List<CredentialDO> = emptyList(), showMasterPasswordPopup: MutableState<Boolean>) {
     val boxPadding = 16.dp
     Box(
         modifier = Modifier
@@ -33,7 +34,7 @@ fun ItemList(list: List<CredentialDO> = emptyList()) {
                 .verticalScroll(rememberScrollState())
         ) {
             list.forEach {
-                PwdItem(it.platform, it.email, it.password)
+                PwdItem(it.platform, it.email, it.password, showMasterPasswordPopup)
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }

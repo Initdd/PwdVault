@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,10 +32,11 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.passmanager.isLocked
 
 
 @Composable
-fun PwdItem(platform: String, email: String, password: String = "", ) {
+fun PwdItem(platform: String, email: String, password: String = "", showMasterPasswordPopup: MutableState<Boolean>) {
     // Constants
     // Dimensions
     val itemPadding = 8.dp
@@ -45,12 +47,12 @@ fun PwdItem(platform: String, email: String, password: String = "", ) {
     val lockedCardColor = MaterialTheme.colorScheme.outline
     val unlockedCardColor = MaterialTheme.colorScheme.secondary
 
-    // Locked/Unlocked State variable
-    val isLocked = remember { mutableStateOf(true) }
     // Visible/Hidden password state variable
     val isPasswordVisible = remember { mutableStateOf(false) }
     // Clipboard Manager
     val clipboardManager = LocalClipboardManager.current
+    
+    val isItemLocked = remember { mutableStateOf(true) }
 
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
@@ -78,7 +80,7 @@ fun PwdItem(platform: String, email: String, password: String = "", ) {
                 Box(
                     modifier = Modifier
                         .background(
-                            if (isLocked.value)
+                            if (isLocked.value || isItemLocked.value)
                                 lockedCardColor
                             else
                                 unlockedCardColor
@@ -92,7 +94,7 @@ fun PwdItem(platform: String, email: String, password: String = "", ) {
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
                             .padding(8.dp),
-                        color = if (isLocked.value)
+                        color = if (isLocked.value || isItemLocked.value)
                             Color.Black
                         else
                             Color.White
@@ -110,7 +112,7 @@ fun PwdItem(platform: String, email: String, password: String = "", ) {
                 Box(
                     modifier = Modifier
                         .background(
-                            if (isLocked.value)
+                            if (isLocked.value || isItemLocked.value)
                                 lockedCardColor
                             else
                                 unlockedCardColor
@@ -127,7 +129,7 @@ fun PwdItem(platform: String, email: String, password: String = "", ) {
 
                     ) {
                         Text(
-                            text = if (isLocked.value)
+                            text = if (isLocked.value || isItemLocked.value)
                                 email
                             else
                                 if (isPasswordVisible.value)
@@ -139,18 +141,18 @@ fun PwdItem(platform: String, email: String, password: String = "", ) {
                             modifier = Modifier
                                 .padding(8.dp)
                                 .weight(1f),
-                            color = if (isLocked.value)
+                            color = if (isLocked.value || isItemLocked.value)
                                 Color.Black
                             else
                                 Color.White
                         )
-                        if (!isLocked.value)
+                        if (!isLocked.value && !isItemLocked.value)
                             IconButton(
                                 onClick = {
                                     isPasswordVisible.value = !isPasswordVisible.value
                                 },
                                 colors = IconButtonDefaults.iconButtonColors(
-                                    contentColor = if (isLocked.value)
+                                    contentColor = if (isLocked.value || isItemLocked.value)
                                         Color.Black
                                     else
                                         Color.White
@@ -175,7 +177,7 @@ fun PwdItem(platform: String, email: String, password: String = "", ) {
                 Box(
                     modifier = Modifier
                         .background(
-                            if (isLocked.value)
+                            if (isLocked.value || isItemLocked.value)
                                 lockedCardColor
                             else
                                 unlockedCardColor
@@ -186,20 +188,24 @@ fun PwdItem(platform: String, email: String, password: String = "", ) {
                     IconButton(
                         onClick = {
                             if (isLocked.value){
-                                isLocked.value = !isLocked.value
+                                //isLocked.value = !isLocked.value
+                                showMasterPasswordPopup.value = true
                             } else {
-                                clipboardManager.setText(AnnotatedString(password))
+                                if (isItemLocked.value)
+                                    isItemLocked.value = false
+                                else
+                                    clipboardManager.setText(AnnotatedString(password))
                             }
                         },
                         colors = IconButtonDefaults.iconButtonColors(
-                            contentColor = if (isLocked.value)
+                            contentColor = if (isLocked.value || isItemLocked.value)
                                 Color.Black
                             else
                                 Color.White
                         )
                     ) {
                         Icon(
-                            imageVector = if (isLocked.value)
+                            imageVector = if (isLocked.value || isItemLocked.value)
                                 Icons.Filled.Lock
                             else
                                 Icons.Filled.ContentCopy,
