@@ -2,7 +2,10 @@ package com.example.passmanager.scripts.buttons
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
@@ -12,25 +15,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 
 @Composable
-fun MyElevatedButton(content: @Composable () -> Unit) =
+fun MyElevatedButton(onClick: () -> Unit, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     ElevatedButton(
-        onClick = { /*TODO*/ },
-        modifier = Modifier
-            .padding(bottom = 16.dp)
+        onClick = onClick,
+        modifier = modifier
+            .padding(0.dp)
+            .padding(bottom = 8.dp)
             .width(300.dp),
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
@@ -40,6 +41,7 @@ fun MyElevatedButton(content: @Composable () -> Unit) =
     ) {
         content()
     }
+}
 
 @Composable
 fun MySwitch(
