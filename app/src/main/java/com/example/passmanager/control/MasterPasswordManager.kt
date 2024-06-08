@@ -21,8 +21,19 @@ class MasterPasswordManager (
 
     fun get(): MasterPasswordDO {
         // ? Currently mapping from dto to domain and then returning the domain. Can change that later
-        val encryptedPassword = storageManager.retrieveAll().first()
+        val encryptedPasswordList: List<MasterPasswordDT> = storageManager.retrieveAll()
+        // If the list is empty, return an empty password
+        val encryptedPassword = if (encryptedPasswordList.isEmpty()) MasterPasswordMapper.toDTO(MasterPasswordDO(""))
+        // Otherwise, return the first element
+        else encryptedPasswordList.first()
         return MasterPasswordMapper.toDomain(encryptedPassword)
+    }
+
+    fun check(password: MasterPasswordDO): Boolean {
+        val encryptedPassword = get()
+        println("Encrypted password: ${encryptedPassword.password}")
+        println("Password: ${password.password}")
+        return hash(password.password) == encryptedPassword.password
     }
 
     private fun hash(password: String): String {
