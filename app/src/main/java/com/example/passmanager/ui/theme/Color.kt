@@ -16,7 +16,7 @@ val Pink40 = Color(0xFF7D5260)
 val eerieBlack = Color(0xFF1A1F16)
 val pakistanGreen = Color(0xFF1E3F20)
 val hunterGreen = Color(0xFF345830)
-val mantis = Color(0xFF69CE5E)
+val pigmentedGreen = Color(0xFF55A54C)
 
 val magnolia = Color(0xFFECE5F0)
 val lion = Color(0xFFB49A67)

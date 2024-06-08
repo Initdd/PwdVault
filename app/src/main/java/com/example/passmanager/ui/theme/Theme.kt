@@ -9,9 +9,11 @@ import androidx.compose.runtime.Immutable
 
 private val DarkColorScheme = darkColorScheme(
     background = eerieBlack,
-    primary = hunterGreen,
+    primary = pigmentedGreen,
     secondary = pakistanGreen,
     tertiary = lion,
+    outline = teagreen,
+    surface = black,
 )
 
 private val LightColorScheme = lightColorScheme(

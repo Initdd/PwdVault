@@ -1,24 +1,31 @@
 package com.example.passmanager
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.passmanager.dal.domain.ThemeModeDO
 import com.example.passmanager.scripts.buttons.MyElevatedButton
 import com.example.passmanager.scripts.buttons.MySwitch
+import com.example.passmanager.scripts.cards.MyElevatedCard
 import com.example.passmanager.ui.theme.PassManagerTheme
 
 
@@ -32,52 +39,78 @@ class SettingsActivity : ComponentActivity() {
     }
 }
 
+@Preview(
+    device = "spec:width=2280px,height=1080px,orientation=portrait",
+    showBackground = true, showSystemUi = true,
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+)
 @Composable
 fun SettingsPage() {
-
     PassManagerTheme(
         darkTheme = themeMode.value == ThemeModeDO.DARK
     ) {
-        Column(
+        Scaffold(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp, 32.dp)
-        ) {
-            Text(
-                text = "Settings",
-                style = MaterialTheme.typography.titleLarge,
+        ) { innerPadding ->
+            Column(
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .align(alignment = Alignment.CenterHorizontally)
-            )
-            MyElevatedButton {
-                Text(text = "Change password")
-            }
-            MyElevatedButton {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .padding(innerPadding)
+                    .padding(16.dp, 32.dp)
+            ) {
+                Text( // Settings title
+                    text = "Settings",
+                    style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier
-                        .fillMaxWidth(0.6f)
+                        .padding(bottom = 16.dp)
+                        .align(alignment = Alignment.CenterHorizontally)
+                )
+                MyElevatedButton(
+                    onClick = { /* TODO */ },
+                    modifier = Modifier
+                        .fillMaxWidth()
                 ) {
-                    Text(text = "Theme")
-                    MySwitch(
-                        checkedTrackColor = MaterialTheme.colorScheme.primary,
-                        uncheckedTrackColor = MaterialTheme.colorScheme.onSurface,
-                        gapBetweenThumbAndTrackEdge = 4.dp
+                    Text(text = "Change Master password")
+                }
+                MyElevatedCard (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .fillMaxWidth()
                     ) {
-                        themeMode.value = if (themeMode.value == ThemeModeDO.LIGHT) {
-                            ThemeModeDO.DARK
-                        } else {
-                            ThemeModeDO.LIGHT
+                        Text(
+                            text = "Theme",
+                        )
+                        Spacer(modifier = Modifier.padding(16.dp, 0.dp))
+                        MySwitch(
+                            checkedTrackColor = MaterialTheme.colorScheme.primary,
+                            uncheckedTrackColor = MaterialTheme.colorScheme.onSurface,
+                            gapBetweenThumbAndTrackEdge = 4.dp
+                        ) {
+                            themeMode.value = if (themeMode.value == ThemeModeDO.LIGHT) {
+                                ThemeModeDO.DARK
+                            } else {
+                                ThemeModeDO.LIGHT
+                            }
+                            themeModeManager.setTheme(themeMode.value)
+                            themeModeManager.saveTMToFile()
                         }
-                        themeModeManager.setTheme(themeMode.value)
-                        themeModeManager.saveTMToFile()
                     }
                 }
-            }
-            MyElevatedButton {
-                Text(text = "Delete all credentials")
+                MyElevatedButton(
+                    onClick = { /* TODO */ },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Text(text = "Delete all credentials")
+                }
             }
         }
     }
