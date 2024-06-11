@@ -14,6 +14,12 @@ class CredentialsManager (
 ) {
 
     fun add(platform: String, email: String, password: String): Boolean {
+        // check if the platform and email already exist
+        storage.retrieveAll().forEach {
+            if (it.platform == platform && it.email == email) {
+                return false
+            }
+        }
         return storage.store(CredentialMapper.toDTO(CredentialDO(platform, email, password)))
     }
 
@@ -27,6 +33,15 @@ class CredentialsManager (
 
     fun remove(idx: Int): Boolean {
         return storage.delete(idx)
+    }
+
+    fun removeBy(platform: String, email: String) {
+        // remove all credentials with the same platform and email
+        storage.retrieveAll().forEachIndexed { idx, cred ->
+            if (cred.platform == platform && cred.email == email) {
+                storage.delete(idx)
+            }
+        }
     }
 
     fun deleteAll() {
