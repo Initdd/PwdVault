@@ -33,7 +33,7 @@ class MasterPasswordManager (
         val encryptedPassword = get()
         println("Encrypted password: ${encryptedPassword.password}")
         println("Password: ${password.password}")
-        return hash(password.password) == encryptedPassword.password
+        return password == encryptedPassword//hash(password.password) == encryptedPassword.password
     }
 
     private fun hash(password: String): String {

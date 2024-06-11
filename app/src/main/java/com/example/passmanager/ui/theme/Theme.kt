@@ -5,12 +5,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 
 private val DarkColorScheme = darkColorScheme(
     background = eerieBlack,
     primary = pigmentedGreen,
     secondary = pakistanGreen,
+    onSecondary = coolgrey,
     tertiary = lion,
     outline = teagreen,
     surface = black,

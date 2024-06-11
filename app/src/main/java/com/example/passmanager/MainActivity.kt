@@ -32,12 +32,12 @@ import com.example.passmanager.dal.dto.compareCredentialDT
 import com.example.passmanager.dal.dto.compareMasterPasswordDT
 import com.example.passmanager.dal.dto.compareThemeModeDT
 import com.example.passmanager.dal.loadFromFile
-import com.example.passmanager.scripts.bars.TopBar
-import com.example.passmanager.scripts.buttons.AddPwdButton
-import com.example.passmanager.scripts.lists.ItemList
-import com.example.passmanager.scripts.popups.AddCredentialsPopup
-import com.example.passmanager.scripts.popups.EnterMasterPwdPopup
 import com.example.passmanager.ui.theme.PassManagerTheme
+import com.example.passmanager.view.bars.TopBar
+import com.example.passmanager.view.buttons.AddPwdButton
+import com.example.passmanager.view.lists.ItemList
+import com.example.passmanager.view.popups.AddCredentialsPopup
+import com.example.passmanager.view.popups.EnterMasterPwdPopup
 
 // Constants
 // File paths
@@ -142,7 +142,7 @@ fun PassManagerApp() {
                 verticalArrangement = Arrangement.Top
             ) {
                 TopBar(LocalContext.current)
-                ItemList(credentialsList.value, showAddEnterMasterPwdPopup)
+                ItemList(credentialsList, showAddEnterMasterPwdPopup)
                 AddPwdButton(showAddPassPopup)
                 if (showAddPassPopup.value) {
                     AddCredentialsPopup(showAddPassPopup)

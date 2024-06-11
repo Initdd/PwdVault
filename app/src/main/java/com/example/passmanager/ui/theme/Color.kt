@@ -23,6 +23,7 @@ val lion = Color(0xFFB49A67)
 
 val azure = Color(0xFFEAFFFD)
 val columbiablue = Color(0xFFC9F0FF)
+val coolgrey = Color(0xFF9899A6)
 
 val teagreen = Color(0xFFC1E1C5)
 val mintcream = Color(0xFFF1FFFA)
