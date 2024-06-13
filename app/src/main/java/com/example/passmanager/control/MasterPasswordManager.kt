@@ -12,18 +12,31 @@ class MasterPasswordManager (
     private val file: File
 ) {
 
+    init {
+        // Check if the file exists and create it if it doesn't
+        if (!file.exists()) file.createNewFile()
+        get()
+    }
+
     fun set(masterPasswordDO: MasterPasswordDO) {
         // Hash the password before storing it
-        // ? Currently mapping from domain to dto and then storing the dto. Can change that later
         val encryptedPassword = masterPasswordDO.copy(password = hash(masterPasswordDO.password))
+        // check if there is no password stored, if so, store the password
+        if (storageManager.retrieveAll().isEmpty()) {
+            storageManager.store(MasterPasswordMapper.toDTO(encryptedPassword))
+        }
         storageManager.update(0, MasterPasswordMapper.toDTO(encryptedPassword))
     }
 
     fun get(): MasterPasswordDO {
         // ? Currently mapping from dto to domain and then returning the domain. Can change that later
         val encryptedPasswordList: List<MasterPasswordDT> = storageManager.retrieveAll()
-        // If the list is empty, return an empty password
-        val encryptedPassword = if (encryptedPasswordList.isEmpty()) MasterPasswordMapper.toDTO(MasterPasswordDO(""))
+        // If the list is empty, save and return an empty password
+        val encryptedPassword = if (encryptedPasswordList.isEmpty()) {
+            val emptyPassword = MasterPasswordDO("")
+            set(emptyPassword)
+            MasterPasswordMapper.toDTO(emptyPassword)
+        }
         // Otherwise, return the first element
         else encryptedPasswordList.first()
         return MasterPasswordMapper.toDomain(encryptedPassword)
@@ -33,7 +46,7 @@ class MasterPasswordManager (
         val encryptedPassword = get()
         println("Encrypted password: ${encryptedPassword.password}")
         println("Password: ${password.password}")
-        return password == encryptedPassword//hash(password.password) == encryptedPassword.password
+        return hash(password.password) == encryptedPassword.password
     }
 
     private fun hash(password: String): String {
