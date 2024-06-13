@@ -1,5 +1,6 @@
 package com.example.passmanager.control
 
+import com.example.passmanager.control.encryption.HashingManager
 import com.example.passmanager.dal.Storage
 import com.example.passmanager.dal.domain.MasterPasswordDO
 import com.example.passmanager.dal.dto.MasterPasswordDT
@@ -50,7 +51,7 @@ class MasterPasswordManager (
     }
 
     private fun hash(password: String): String {
-        return password.hashCode().toString()
+        return HashingManager.hashString(password)
     }
 
     fun saveMPToFile() {
