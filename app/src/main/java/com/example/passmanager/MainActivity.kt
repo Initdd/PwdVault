@@ -144,11 +144,29 @@ fun PassManagerApp() {
                 TopBar(LocalContext.current)
                 ItemList(credentialsList, showAddEnterMasterPwdPopup)
                 AddPwdButton(showAddPassPopup)
+
+                // Popups
                 if (showAddPassPopup.value) {
-                    AddCredentialsPopup(showAddPassPopup)
+                    AddCredentialsPopup(
+                        onSubmit = { platform, email, password ->
+                            credentialsManager.add(platform, email, password)
+                            credentialsList.value = credentialsManager.getAll()
+                            showAddPassPopup.value = false
+                        },
+                        onCancel = { showAddPassPopup.value = false }
+                    )
                 }
                 if (showAddEnterMasterPwdPopup.value) {
-                    EnterMasterPwdPopup(masterPassword, showAddEnterMasterPwdPopup)
+                    EnterMasterPwdPopup(
+                        onSubmit = {
+                            if (masterPasswordManager.check(it)) {
+                                isLocked.value = false
+                                masterPassword.value = it
+                                showAddEnterMasterPwdPopup.value = false
+                            }
+                        },
+                        onCancel = { showAddEnterMasterPwdPopup.value = false }
+                    )
                 }
             }
         }

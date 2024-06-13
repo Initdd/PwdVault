@@ -36,8 +36,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
+import com.example.passmanager.credentialsManager
 import com.example.passmanager.dal.domain.CredentialDO
 import com.example.passmanager.isLocked
+import com.example.passmanager.view.popups.CopyCredentialsDataPopup
 import dev.obvionaoe.compose.swipeablecard.SwipeableCard
 
 @SuppressLint("UnrememberedMutableState")
@@ -50,7 +52,6 @@ import dev.obvionaoe.compose.swipeablecard.SwipeableCard
 private fun Show_preview() {
     PwdItem("Platform", "test@test.com", "password", mutableStateOf(listOf()), mutableStateOf(true))
 }
-
 
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
@@ -70,12 +71,14 @@ fun PwdItem(
     val lockedCardColor = MaterialTheme.colorScheme.outline
     val unlockedCardColor = MaterialTheme.colorScheme.secondary
 
-    // Visible/Hidden password state variable
+    // Mutable States
     val isPasswordVisible = remember { mutableStateOf(false) }
+    val isItemLocked = remember { mutableStateOf(true) }
+    val showCopyCredentialsDataPopup = remember { mutableStateOf(false) }
+
     // Clipboard Manager
     val clipboardManager = LocalClipboardManager.current
-    
-    val isItemLocked = remember { mutableStateOf(true) }
+
 
     SwipeableCard (
         modifier = Modifier
@@ -87,6 +90,7 @@ fun PwdItem(
                     it.platform != platform ||
                     it.email != email
                 }
+                credentialsManager.removeBy(platform, email)
             }) {
                 Icon(
                     // delete button
@@ -99,7 +103,7 @@ fun PwdItem(
             }
         },
         onClick = {
-            print("Click")
+            showCopyCredentialsDataPopup.value = true
         }
     ) {
         Row(
@@ -252,5 +256,11 @@ fun PwdItem(
                 }
             }
         }
+    }
+    if (showCopyCredentialsDataPopup.value) {
+        CopyCredentialsDataPopup(
+            credential = CredentialDO(platform, email, password),
+            onCancel = { showCopyCredentialsDataPopup.value = false }
+        )
     }
 }

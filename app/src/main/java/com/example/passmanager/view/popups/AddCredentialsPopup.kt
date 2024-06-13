@@ -1,5 +1,6 @@
 package com.example.passmanager.view.popups
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,8 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -25,20 +24,42 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.passmanager.credentialsManager
+import com.example.passmanager.view.buttons.MyElevatedButton
+
+@Preview(
+    device = "spec:width=2280px,height=1080px,orientation=portrait",
+    showBackground = true, showSystemUi = true,
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+)
+@Composable
+fun AddCredentialsPopupPreview() {
+    AddCredentialsPopup(
+        onSubmit = { platform, email, password ->
+            println("Platform: $platform, Email: $email, Password: $password")
+        },
+        onCancel = {
+            println("Cancel")
+        }
+    )
+}
 
 
 @Composable
-fun AddCredentialsPopup(showAddPassPopup: MutableState<Boolean>) {
+fun AddCredentialsPopup(
+    onSubmit: (platform: String, email: String, password: String) -> Unit,
+    onCancel: () -> Unit
+) {
     // Constants
     // Dimensions
     val padding = 32.dp
     val itemPadding = 8.dp
-    val dialogVerticalPadding = padding*5
-    val buttonWidth = 70.dp
+    val dialogVerticalPadding = padding*4
+    val buttonWidth = 100.dp
     // Colors
     val itemColor = MaterialTheme.colorScheme.surface
 
@@ -51,11 +72,11 @@ fun AddCredentialsPopup(showAddPassPopup: MutableState<Boolean>) {
 
     Dialog(
         onDismissRequest = {
-            showAddPassPopup.value = false
+            onCancel()
         },
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
     ){
-        Box(
+        Box (
             modifier = Modifier
                 .padding(padding, dialogVerticalPadding)
                 .fillMaxWidth()
@@ -63,7 +84,7 @@ fun AddCredentialsPopup(showAddPassPopup: MutableState<Boolean>) {
                 .background(itemColor),
             contentAlignment = Alignment.CenterStart
         ) {
-            Column(
+            Column (
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(itemPadding * 2),
@@ -118,15 +139,12 @@ fun AddCredentialsPopup(showAddPassPopup: MutableState<Boolean>) {
                     horizontalArrangement = Arrangement.End
                 ) {
                     ElevatedCard {
-                        IconButton(
+                        MyElevatedButton(
                             onClick = {
-                                showAddPassPopup.value = false
+                                onCancel()
                             },
-                            colors = IconButtonDefaults.iconButtonColors(
-                                contentColor = MaterialTheme.colorScheme.primary
-                            ),
                             modifier = Modifier
-                                .padding(itemPadding)
+                                //.padding(itemPadding)
                                 .width(buttonWidth)
                         ) {
                             Text(
@@ -139,16 +157,12 @@ fun AddCredentialsPopup(showAddPassPopup: MutableState<Boolean>) {
                     }
                     Spacer(modifier = Modifier.width(itemPadding))
                     ElevatedCard {
-                        IconButton(
+                        MyElevatedButton(
                             onClick = {
-                                credentialsManager.add(platform.value, email.value, password.value)
-                                showAddPassPopup.value = false
+                                onSubmit(platform.value, email.value, password.value)
                             },
-                            colors = IconButtonDefaults.iconButtonColors(
-                                contentColor = MaterialTheme.colorScheme.primary
-                            ),
                             modifier = Modifier
-                                .padding(itemPadding)
+                                //.padding(itemPadding)
                                 .width(buttonWidth)
                         ) {
                             Text(

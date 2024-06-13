@@ -36,11 +36,15 @@ class CredentialsManager (
     }
 
     fun removeBy(platform: String, email: String) {
-        // remove all credentials with the same platform and email
-        storage.retrieveAll().forEachIndexed { idx, cred ->
-            if (cred.platform == platform && cred.email == email) {
-                storage.delete(idx)
+        // Remove all credentials with the same platform and email
+        val keysToRemove = mutableListOf<Int>()
+        storage.retrieveAll().forEachIndexed { k, v ->
+            if (v.platform == platform && v.email == email) {
+                keysToRemove.add(k)
             }
+        }
+        keysToRemove.forEach { key ->
+            storage.delete(key)
         }
     }
 

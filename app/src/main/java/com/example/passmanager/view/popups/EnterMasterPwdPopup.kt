@@ -43,17 +43,23 @@ import com.example.passmanager.view.cards.MyElevatedCard
 )
 @Composable
 private fun Show_preview() {
-    EnterMasterPwdPopup(mutableStateOf(MasterPasswordDO("empty")), mutableStateOf(true))
+    EnterMasterPwdPopup(
+        onSubmit = {},
+        onCancel = {}
+    )
 }
 
 @Composable
-fun EnterMasterPwdPopup(masterPwd: MutableState<MasterPasswordDO?>, showEnterMasterPwdPopup: MutableState<Boolean>) {
+fun EnterMasterPwdPopup(
+    onSubmit: (MasterPasswordDO) -> Unit,
+    onCancel: () -> Unit
+) {
 
     val masterPwdStr = remember { mutableStateOf("") }
 
     Dialog(
         onDismissRequest = {
-            showEnterMasterPwdPopup.value = false
+            onCancel()
         },
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
     ) {
@@ -95,7 +101,7 @@ fun EnterMasterPwdPopup(masterPwd: MutableState<MasterPasswordDO?>, showEnterMas
                 ) {
                     MyElevatedButton(
                         onClick = {
-                            showEnterMasterPwdPopup.value = false
+                            onCancel()
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.35f)
@@ -105,11 +111,7 @@ fun EnterMasterPwdPopup(masterPwd: MutableState<MasterPasswordDO?>, showEnterMas
                     Spacer(modifier = Modifier.width(8.dp))
                     MyElevatedButton(
                         onClick = {
-                            showEnterMasterPwdPopup.value = false
-                            masterPwd.value = MasterPasswordDO(masterPwdStr.value)
-                            if (masterPasswordManager.check(masterPwd.value!!)) {
-                                isLocked.value = false
-                            }
+                            onSubmit(MasterPasswordDO(masterPwdStr.value))
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.6f)

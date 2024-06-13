@@ -26,7 +26,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MyElevatedButton(onClick: () -> Unit, modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun MyElevatedButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    primaryColor: Color = MaterialTheme.colorScheme.primary,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
+    content: @Composable () -> Unit,
+) {
     ElevatedButton(
         onClick = onClick,
         modifier = modifier
@@ -34,13 +40,13 @@ fun MyElevatedButton(onClick: () -> Unit, modifier: Modifier = Modifier, content
             .padding(bottom = 8.dp)
             .width(300.dp),
         shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+        border = BorderStroke(1.dp, primaryColor),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 5.dp
         ),
         colors = ButtonDefaults.elevatedButtonColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.primary
+            containerColor = backgroundColor,
+            contentColor = primaryColor
         ),
     ) {
         content()

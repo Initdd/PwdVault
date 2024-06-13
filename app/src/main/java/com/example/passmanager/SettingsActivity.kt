@@ -16,6 +16,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -25,6 +27,8 @@ import com.example.passmanager.ui.theme.PassManagerTheme
 import com.example.passmanager.view.buttons.MyElevatedButton
 import com.example.passmanager.view.buttons.MySwitch
 import com.example.passmanager.view.cards.MyElevatedCard
+import com.example.passmanager.view.popups.ChangeMasterPwdPopup
+import com.example.passmanager.view.popups.DeleteConfirmationPopup
 
 
 class SettingsActivity : ComponentActivity() {
@@ -44,6 +48,10 @@ class SettingsActivity : ComponentActivity() {
 )
 @Composable
 fun SettingsPage() {
+
+    val showDeleteConfirmationPopup = remember { mutableStateOf(false) }
+    val showChangeMasterPwdPopup = remember { mutableStateOf(false) }
+
     PassManagerTheme(
         darkTheme = themeMode.value == ThemeModeDO.DARK
     ) {
@@ -66,7 +74,9 @@ fun SettingsPage() {
                         .align(alignment = Alignment.CenterHorizontally)
                 )
                 MyElevatedButton(
-                    onClick = { /* TODO */ },
+                    onClick = {
+                        showChangeMasterPwdPopup.value = true
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
@@ -103,13 +113,42 @@ fun SettingsPage() {
                     }
                 }
                 MyElevatedButton(
-                    onClick = { /* TODO */ },
+                    onClick = {
+                        showDeleteConfirmationPopup.value = true
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
                     Text(text = "Delete all credentials")
                 }
             }
+        }
+        if (showDeleteConfirmationPopup.value) {
+            DeleteConfirmationPopup(
+                onDelete = {
+                    credentialsManager.deleteAll()
+                    credentialsList.value = credentialsManager.getAll()
+                    showDeleteConfirmationPopup.value = false
+                },
+                onCancel = {
+                    showDeleteConfirmationPopup.value = false
+                },
+                toDeleteStr = "all credentials"
+            )
+        }
+        if (showChangeMasterPwdPopup.value) {
+            ChangeMasterPwdPopup(
+                onConfirm = { oldMasterPassword, newMasterPassword ->
+                    if (masterPasswordManager.check(oldMasterPassword)) {
+                        masterPasswordManager.set(newMasterPassword)
+                        masterPasswordManager.saveMPToFile()
+                        showChangeMasterPwdPopup.value = false
+                    }
+                },
+                onCancel = {
+                    showChangeMasterPwdPopup.value = false
+                }
+            )
         }
     }
 }
