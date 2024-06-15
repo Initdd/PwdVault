@@ -127,7 +127,7 @@ fun SettingsPage() {
             DeleteConfirmationPopup(
                 onDelete = {
                     credentialsManager.deleteAll()
-                    credentialsList.value = credentialsManager.getAll()
+                    credentialsList.value = credentialsManager.getAll(null)
                     showDeleteConfirmationPopup.value = false
                 },
                 onCancel = {

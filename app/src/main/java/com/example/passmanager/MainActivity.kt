@@ -38,6 +38,9 @@ import com.example.passmanager.view.buttons.AddPwdButton
 import com.example.passmanager.view.lists.ItemList
 import com.example.passmanager.view.popups.AddCredentialsPopup
 import com.example.passmanager.view.popups.EnterMasterPwdPopup
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 // Constants
 // File paths
@@ -51,6 +54,7 @@ lateinit var masterPasswordManager: MasterPasswordManager
 lateinit var credentialsManager: CredentialsManager
 
 // Global
+val scope = CoroutineScope(Dispatchers.IO)
 lateinit var credentialsList: MutableState<List<CredentialDO>>
 lateinit var themeMode: MutableState<ThemeModeDO>
 lateinit var isLocked: MutableState<Boolean>
@@ -122,14 +126,16 @@ fun PassManagerApp() {
 
     // show popups boolean
     val showAddPassPopup = remember { mutableStateOf(false) }
-    val showAddEnterMasterPwdPopup = remember { mutableStateOf(false) }
+    val showEnterMasterPwdPopup = remember { mutableStateOf(false) }
+    val showEditCredentialsPopup = remember { mutableStateOf(false) }
 
     // Global variables initialization
     isLocked = remember { mutableStateOf(true) }
-    credentialsList = remember { mutableStateOf(credentialsManager.getAll()) }
+    credentialsList = remember { mutableStateOf(credentialsManager.getAll(null)) }
     themeMode = remember { mutableStateOf(themeModeManager.getTheme()) }
 
     val masterPassword = remember { mutableStateOf<MasterPasswordDO?>(null) }
+    var toEdit: CredentialDO? = null
 
     PassManagerTheme(
         darkTheme = themeMode.value == ThemeModeDO.DARK
@@ -141,31 +147,107 @@ fun PassManagerApp() {
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Top
             ) {
-                TopBar(LocalContext.current)
-                ItemList(credentialsList, showAddEnterMasterPwdPopup)
-                AddPwdButton(showAddPassPopup)
+                TopBar(LocalContext.current) { keyword ->
+                    credentialsList.value = credentialsManager.getAll(masterPassword.value)
+                        .filter {
+                            it.platform.contains(keyword, ignoreCase = true) ||
+                            it.email.contains(keyword, ignoreCase = true)
+                        }
+                }
+                ItemList(
+                    list = credentialsList,
+                    unlock = { showEnterMasterPwdPopup.value = true },
+                    delete = { platform: String, email: String ->
+                        if (isLocked.value) {
+                            showEnterMasterPwdPopup.value = true
+                        } else {
+                            credentialsList.value = credentialsList.value.filter {
+                                it.platform != platform ||
+                                        it.email != email
+                            }
+                            credentialsManager.remove(platform, email)
+                        }
+                    },
+                    edit = { credential: CredentialDO ->
+                        if (isLocked.value) {
+                            showEnterMasterPwdPopup.value = true
+                        } else {
+                            toEdit = credentialsList.value.find {
+                                it.platform == credential.platform &&
+                                        it.email == credential.email
+                            }
+                            showEditCredentialsPopup.value = true
+                        }
+                    }
+                )
+                AddPwdButton {
+                    if (isLocked.value) {
+                        showEnterMasterPwdPopup.value = true
+                    } else {
+                        showAddPassPopup.value = true
+                    }
+                }
 
                 // Popups
                 if (showAddPassPopup.value) {
                     AddCredentialsPopup(
                         onSubmit = { platform, email, password ->
-                            credentialsManager.add(platform, email, password)
-                            credentialsList.value = credentialsManager.getAll()
+                            credentialsManager.add(
+                                CredentialDO(platform, email, password),
+                                masterPassword.value!!
+                            )
+                            credentialsList.value = credentialsManager.getAll(masterPassword.value)
                             showAddPassPopup.value = false
+                            scope.launch {
+                                credentialsManager.saveCredToFile()
+                            }
                         },
                         onCancel = { showAddPassPopup.value = false }
                     )
                 }
-                if (showAddEnterMasterPwdPopup.value) {
+                if (showEditCredentialsPopup.value) {
+                    if (toEdit != null) {
+                        AddCredentialsPopup(
+                            onSubmit = { platform, email, password ->
+                                credentialsManager.update(
+                                    toEdit!!.platform,
+                                    toEdit!!.email,
+                                    CredentialDO(
+                                        platform.ifEmpty { toEdit!!.platform },
+                                        email.ifEmpty { toEdit!!.email },
+                                        password.ifEmpty { toEdit!!.password }
+                                    ),
+                                    masterPassword.value!!
+                                )
+                                toEdit = null
+                                credentialsList.value =
+                                    credentialsManager.getAll(masterPassword.value)
+                                showEditCredentialsPopup.value = false
+                                scope.launch {
+                                    credentialsManager.saveCredToFile()
+                                }
+                            },
+                            onCancel = {
+                                showEditCredentialsPopup.value = false
+                            },
+                        )
+                    }
+                }
+                if (showEnterMasterPwdPopup.value) {
                     EnterMasterPwdPopup(
                         onSubmit = {
                             if (masterPasswordManager.check(it)) {
-                                isLocked.value = false
-                                masterPassword.value = it
-                                showAddEnterMasterPwdPopup.value = false
+                                try {
+                                    isLocked.value = false
+                                    masterPassword.value = it
+                                    showEnterMasterPwdPopup.value = false
+                                    credentialsList.value = credentialsManager.getAll(masterPassword.value)
+                                } catch (e: SecurityException) {
+                                    showEnterMasterPwdPopup.value = false
+                                }
                             }
                         },
-                        onCancel = { showAddEnterMasterPwdPopup.value = false }
+                        onCancel = { showEnterMasterPwdPopup.value = false }
                     )
                 }
             }
