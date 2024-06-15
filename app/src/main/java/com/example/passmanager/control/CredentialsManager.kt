@@ -1,7 +1,9 @@
 package com.example.passmanager.control
 
+import com.example.passmanager.control.encryption.EncryptionManager
 import com.example.passmanager.dal.Storage
 import com.example.passmanager.dal.domain.CredentialDO
+import com.example.passmanager.dal.domain.MasterPasswordDO
 import com.example.passmanager.dal.dto.CredentialDT
 import com.example.passmanager.dal.mapper.CredentialMapper
 import com.example.passmanager.dal.saveToFile
@@ -10,32 +12,64 @@ import java.io.File
 
 class CredentialsManager (
     private val storage: Storage<Int, CredentialDT>,
-    private val file: File
+    private val file: File,
 ) {
 
-    fun add(platform: String, email: String, password: String): Boolean {
+    fun add(credentialDO: CredentialDO, masterPasswordDO: MasterPasswordDO): Boolean {
         // check if the platform and email already exist
         storage.retrieveAll().forEach {
-            if (it.platform == platform && it.email == email) {
+            if (it.platform == credentialDO.platform && it.email == credentialDO.email) {
                 return false
             }
         }
-        return storage.store(CredentialMapper.toDTO(CredentialDO(platform, email, password)))
+        return storage.store(
+            CredentialMapper.toDTO(
+                credentialDO.copy(
+                    password = EncryptionManager.encrypt(masterPasswordDO.password, credentialDO.password)
+                )
+            )
+        )
     }
 
-    fun get(idx: Int): CredentialDO? {
-        return storage.retrieve(idx)?.let { CredentialMapper.toDomain(it) }
+    fun getAll(masterPasswordDO: MasterPasswordDO?): List<CredentialDO> {
+        return storage.retrieveAll().map {
+            if (masterPasswordDO == null) {
+                println("masterPasswordDO is null")
+                return@map CredentialMapper.toDomain(it)
+            }
+            try {
+                CredentialMapper.toDomain(
+                    it.copy(
+                        password = EncryptionManager.decrypt(masterPasswordDO.password, it.password)
+                    )
+                )
+            } catch (e: Exception) {
+                // If the password cannot be decrypted, return the original credential list not decrypted
+                println("Error decrypting password")
+                CredentialMapper.toDomain(it)
+            }
+        }
     }
 
-    fun getAll(): List<CredentialDO> {
-        return storage.retrieveAll().map { CredentialMapper.toDomain(it) }
+    fun get(platform: String, email: String): CredentialDO? {
+        return storage.retrieveAll()
+            .filter { it.platform == platform && it.email == email }
+            .map { CredentialMapper.toDomain(it) }
+            .firstOrNull()
     }
 
-    fun remove(idx: Int): Boolean {
-        return storage.delete(idx)
+    fun getWithPwd(platform: String, email: String, masterPasswordDO: MasterPasswordDO): CredentialDO? {
+        val credential = get(platform, email) ?: return null
+        return try {
+            credential.copy(
+                password = EncryptionManager.decrypt(masterPasswordDO.password, credential.password)
+            )
+        } catch (e: Exception) {
+            throw SecurityException("Invalid master password")
+        }
     }
 
-    fun removeBy(platform: String, email: String) {
+    fun remove(platform: String, email: String) {
         // Remove all credentials with the same platform and email
         val keysToRemove = mutableListOf<Int>()
         storage.retrieveAll().forEachIndexed { k, v ->
@@ -52,9 +86,20 @@ class CredentialsManager (
         storage.deleteAll()
     }
 
-    fun updatePassword(idx: Int, newPassword: String): Boolean {
-        val credential = storage.retrieve(idx) ?: return false
-        return storage.update(idx, credential.copy(password = newPassword))
+    fun update(oldPlatform: String, oldEmail: String, newCredential: CredentialDO, masterPasswordDO: MasterPasswordDO): Boolean {
+        val credentials = storage.retrieveAll()
+        val idx = credentials.indexOfFirst { it.platform == oldPlatform && it.email == oldEmail }
+        if (idx == -1) {
+            return false
+        }
+        return storage.update(
+            idx,
+            CredentialMapper.toDTO(
+                newCredential.copy(
+                    password = EncryptionManager.encrypt(masterPasswordDO.password, newCredential.password)
+                )
+            )
+        )
     }
 
     fun saveCredToFile() {
