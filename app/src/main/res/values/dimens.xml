@@ -3,5 +3,5 @@
     <dimen name="text_size">16sp</dimen>
     <dimen name="text_size_large">24sp</dimen>
     <dimen name="text_size_small">12sp</dimen>
-    <dimen name="swipeable_card_size">50dp</dimen>
+    <dimen name="swipeable_card_size">90dp</dimen>
 </resources>
