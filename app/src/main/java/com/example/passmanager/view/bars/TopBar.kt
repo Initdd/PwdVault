@@ -24,11 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.passmanager.SettingsActivity
-import com.example.passmanager.credentialsList
-import com.example.passmanager.credentialsManager
 
 @Composable
-fun TopBar(ctx: Context) {
+fun TopBar(ctx: Context, search: (keyword: String) -> Unit) {
 
     val text = remember { mutableStateOf("") }
 
@@ -46,10 +44,7 @@ fun TopBar(ctx: Context) {
                 value = text.value,
                 onValueChange = {textValue ->
                     text.value = textValue
-                    credentialsList.value = credentialsManager.getAll().filter {
-                        it.platform.contains(text.value, ignoreCase = true) ||
-                                it.email.contains(text.value, ignoreCase = true)
-                    }
+                    search(textValue)
                 },
                 label = { Text("Search") },
                 modifier = Modifier

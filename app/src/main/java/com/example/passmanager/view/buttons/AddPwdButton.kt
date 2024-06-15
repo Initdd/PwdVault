@@ -43,14 +43,14 @@ fun PreviewAddPwdButton() {
             modifier = Modifier
                 .fillMaxHeight(0.2f),
         ) {
-            AddPwdButton(remember { mutableStateOf(false) })
+            AddPwdButton(onAddPwd = {})
         }
     }
 }
 
 
 @Composable
-fun AddPwdButton(showAddPassPopup: MutableState<Boolean>) {
+fun AddPwdButton(onAddPwd: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -59,7 +59,7 @@ fun AddPwdButton(showAddPassPopup: MutableState<Boolean>) {
         contentAlignment = Alignment.BottomCenter
     ) {
         ElevatedButton(
-            onClick = { showAddPassPopup.value = true },
+            onClick = onAddPwd,
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(),

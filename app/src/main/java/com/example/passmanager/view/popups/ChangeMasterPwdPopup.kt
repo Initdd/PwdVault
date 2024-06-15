@@ -117,9 +117,9 @@ fun ChangeMasterPwdPopup(
                 Spacer(modifier = Modifier.padding(16.dp))
                 MyElevatedButton(
                     onClick = {
-//                        if (newPwdInput.value.isEmpty() || confirmPwdInput.value.isEmpty() || oldPwdInput.value.isEmpty()) {
-//                            return@MyElevatedButton
-//                        }
+                        if (newPwdInput.value.isEmpty() || confirmPwdInput.value.isEmpty() || oldPwdInput.value.isEmpty()) {
+                            return@MyElevatedButton
+                        }
                         if (newPwdInput.value != confirmPwdInput.value) {
                             return@MyElevatedButton
                         }
@@ -129,6 +129,16 @@ fun ChangeMasterPwdPopup(
                     backgroundColor = MaterialTheme.colorScheme.background
                 ) {
                     Text("Change")
+                }
+                Spacer(modifier = Modifier.padding(8.dp))
+                MyElevatedButton(
+                    onClick = {
+                        onCancel()
+                    },
+                    primaryColor = MaterialTheme.colorScheme.primary,
+                    backgroundColor = MaterialTheme.colorScheme.background
+                ) {
+                    Text("Cancel")
                 }
             }
         }

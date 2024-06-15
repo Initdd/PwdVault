@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material3.Card
@@ -23,7 +24,6 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,7 +36,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
-import com.example.passmanager.credentialsManager
 import com.example.passmanager.dal.domain.CredentialDO
 import com.example.passmanager.isLocked
 import com.example.passmanager.view.popups.CopyCredentialsDataPopup
@@ -50,17 +49,25 @@ import dev.obvionaoe.compose.swipeablecard.SwipeableCard
 )
 @Composable
 private fun Show_preview() {
-    PwdItem("Platform", "test@test.com", "password", mutableStateOf(listOf()), mutableStateOf(true))
+    PwdItem(
+        credential = CredentialDO(
+            platform = "Google",
+            email = "test@test.com",
+            password = "password"
+        ),
+        tryUnlock = {},
+        delete = { _, _ -> },
+        edit = {}
+    )
 }
 
 @OptIn(ExperimentalWearMaterialApi::class)
 @Composable
 fun PwdItem(
-    platform: String,
-    email: String,
-    password: String,
-    credentialsList: MutableState<List<CredentialDO>>,
-    showMasterPasswordPopup: MutableState<Boolean>,
+    credential: CredentialDO,
+    tryUnlock: () -> Unit,
+    delete: (platform: String, email: String) -> Unit,
+    edit: (credential: CredentialDO) -> Unit
 ) {
     // Constants
     // Dimensions
@@ -85,21 +92,31 @@ fun PwdItem(
             .fillMaxWidth()
             .padding(itemPadding),
         endAction = {
-            IconButton(onClick = {
-                credentialsList.value = credentialsList.value.filter {
-                    it.platform != platform ||
-                    it.email != email
+            Row {
+                IconButton(onClick = {
+                    edit(credential)
+                }) {
+                    Icon(
+                        // edit button
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Add",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .scale(1.3f)
+                    )
                 }
-                credentialsManager.removeBy(platform, email)
-            }) {
-                Icon(
-                    // delete button
-                    imageVector = Icons.Default.DeleteOutline,
-                    contentDescription = "Add",
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier
-                        .scale(1.3f)
-                )
+                IconButton(onClick = {
+                    delete(credential.platform, credential.email)
+                }) {
+                    Icon(
+                        // delete button
+                        imageVector = Icons.Default.DeleteOutline,
+                        contentDescription = "Add",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .scale(1.3f)
+                    )
+                }
             }
         },
         onClick = {
@@ -130,7 +147,7 @@ fun PwdItem(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = platform,
+                        text = credential.platform,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
@@ -171,12 +188,12 @@ fun PwdItem(
                     ) {
                         Text(
                             text = if (isLocked.value || isItemLocked.value)
-                                email
+                                credential.email
                             else
                                 if (isPasswordVisible.value)
-                                    password
+                                    credential.password
                                 else
-                                    "*".repeat(password.length),
+                                    "*".repeat(credential.password.length),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
@@ -229,13 +246,12 @@ fun PwdItem(
                     IconButton(
                         onClick = {
                             if (isLocked.value){
-                                //isLocked.value = !isLocked.value
-                                showMasterPasswordPopup.value = true
+                                tryUnlock()
                             } else {
                                 if (isItemLocked.value)
                                     isItemLocked.value = false
                                 else
-                                    clipboardManager.setText(AnnotatedString(password))
+                                    clipboardManager.setText(AnnotatedString(credential.password))
                             }
                         },
                         colors = IconButtonDefaults.iconButtonColors(
@@ -259,8 +275,9 @@ fun PwdItem(
     }
     if (showCopyCredentialsDataPopup.value) {
         CopyCredentialsDataPopup(
-            credential = CredentialDO(platform, email, password),
-            onCancel = { showCopyCredentialsDataPopup.value = false }
+            credential = credential,
+            onCancel = { showCopyCredentialsDataPopup.value = false },
+            isLocked = isLocked.value
         )
     }
 }

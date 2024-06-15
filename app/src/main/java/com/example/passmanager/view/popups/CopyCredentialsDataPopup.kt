@@ -12,9 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -41,14 +38,16 @@ fun CopyCredentialsDataPopupPreview() {
             email = "test@test.com",
             password = "password"
         ),
-        onCancel = {}
+        onCancel = {},
+        isLocked = false
     )
 }
 
 @Composable
 fun CopyCredentialsDataPopup(
     credential: CredentialDO,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    isLocked: Boolean
 ) {
 
     // Constants
@@ -91,6 +90,13 @@ fun CopyCredentialsDataPopup(
                     clipboardManager.setText(AnnotatedString(credential.email))
                 }) {
                     Text("Copy Email")
+                }
+                if (!isLocked) {
+                    MyElevatedButton(onClick = {
+                        clipboardManager.setText(AnnotatedString(credential.password))
+                    }) {
+                        Text("Copy Password")
+                    }
                 }
                 Spacer(modifier = Modifier.padding(16.dp))
                 MyElevatedButton(

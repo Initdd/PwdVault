@@ -18,7 +18,12 @@ import com.example.passmanager.dal.domain.CredentialDO
 
 
 @Composable
-fun ItemList(list: MutableState<List<CredentialDO>>, showMasterPasswordPopup: MutableState<Boolean>) {
+fun ItemList(
+    list: MutableState<List<CredentialDO>>,
+    unlock: () -> Unit,
+    delete: (platform: String, email: String) -> Unit,
+    edit: (credential: CredentialDO) -> Unit
+) {
     val boxPadding = 16.dp
     Box(
         modifier = Modifier
@@ -34,7 +39,12 @@ fun ItemList(list: MutableState<List<CredentialDO>>, showMasterPasswordPopup: Mu
                 .verticalScroll(rememberScrollState())
         ) {
             list.value.forEach {
-                PwdItem(it.platform, it.email, it.password, list, showMasterPasswordPopup)
+                PwdItem(
+                    credential = it,
+                    tryUnlock = unlock,
+                    delete = delete,
+                    edit = edit
+                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }

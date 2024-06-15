@@ -138,40 +138,36 @@ fun AddCredentialsPopup(
                         .padding(itemPadding),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    ElevatedCard {
-                        MyElevatedButton(
-                            onClick = {
-                                onCancel()
-                            },
+                    MyElevatedButton(
+                        onClick = {
+                            onCancel()
+                        },
+                        modifier = Modifier
+                            //.padding(itemPadding)
+                            .width(buttonWidth)
+                    ) {
+                        Text(
+                            "Cancel",
                             modifier = Modifier
-                                //.padding(itemPadding)
-                                .width(buttonWidth)
-                        ) {
-                            Text(
-                                "Cancel",
-                                modifier = Modifier
-                                    .width(buttonWidth),
-                                textAlign = TextAlign.Center
-                            )
-                        }
+                                .width(buttonWidth),
+                            textAlign = TextAlign.Center
+                        )
                     }
                     Spacer(modifier = Modifier.width(itemPadding))
-                    ElevatedCard {
-                        MyElevatedButton(
-                            onClick = {
-                                onSubmit(platform.value, email.value, password.value)
-                            },
+                    MyElevatedButton(
+                        onClick = {
+                            onSubmit(platform.value, email.value, password.value)
+                        },
+                        modifier = Modifier
+                            //.padding(itemPadding)
+                            .width(buttonWidth)
+                    ) {
+                        Text(
+                            "Save",
                             modifier = Modifier
-                                //.padding(itemPadding)
-                                .width(buttonWidth)
-                        ) {
-                            Text(
-                                "Save",
-                                modifier = Modifier
-                                    .width(buttonWidth),
-                                textAlign = TextAlign.Center
-                            )
-                        }
+                                .width(buttonWidth),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }
