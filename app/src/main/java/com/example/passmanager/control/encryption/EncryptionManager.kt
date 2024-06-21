@@ -12,6 +12,9 @@ object EncryptionManager {
     private val selectedEncryption = "AES/CBC/PKCS5Padding"
 
     fun encrypt(key: String, data: String): String {
+        if (key.isEmpty() || data.isEmpty()) {
+            throw IllegalArgumentException("Key and data must not be empty")
+        }
         val instance = MessageDigest.getInstance("SHA-256")
         val bytes: ByteArray = key.toByteArray(StandardCharsets.UTF_8)
         instance.update(bytes, 0, bytes.size)
@@ -22,7 +25,10 @@ object EncryptionManager {
         return Base64.getEncoder().encodeToString(doFinal)
     }
 
-    fun decrypt(key: String, data: String?): String {
+    fun decrypt(key: String, data: String): String {
+        if (key.isEmpty() || data.isEmpty()) {
+            throw IllegalArgumentException("Key and data must not be empty")
+        }
         val instance = MessageDigest.getInstance("SHA-256")
         val bytes: ByteArray = key.toByteArray(StandardCharsets.UTF_8)
         instance.update(bytes, 0, bytes.size)

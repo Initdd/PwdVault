@@ -12,6 +12,9 @@ object HashingManager {
         }
     }
     fun hashString(input: String): String {
+        if (input.isEmpty()) {
+            throw IllegalArgumentException("Input string must not be empty")
+        }
         return hashBytes(input.toByteArray())
     }
 
