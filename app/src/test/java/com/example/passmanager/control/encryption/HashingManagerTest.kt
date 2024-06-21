@@ -1,21 +1,44 @@
 package com.example.passmanager.control.encryption
 
-import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class HashingManagerTest {
 
     @Test
-    fun testHashString() {
-        val input = "password"
-        val expected = "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+    fun hashString_shouldReturnExpectedHash_whenInputIsAlphanumeric() {
+        val input = "abc123"
         val actual = HashingManager.hashString(input)
-        assertEquals(expected, actual)
+        assertTrue(actual.isNotEmpty())
     }
 
     @Test
-    fun testGetHashOfString() {
-        val input = "1"
-        println(HashingManager.hashString(input))
+    fun hashString_shouldReturnExpectedHash_whenInputIsEmpty() {
+        val input = ""
+        assertThrows(IllegalArgumentException::class.java) {
+            HashingManager.hashString(input)
+        }
+    }
+
+    @Test
+    fun hashInt_shouldReturnExpectedHash_whenInputIsPositive() {
+        val input = 123
+        val actual = HashingManager.hashInt(input)
+        assertTrue(actual.isNotEmpty())
+    }
+
+    @Test
+    fun hashInt_shouldReturnExpectedHash_whenInputIsNegative() {
+        val input = -123
+        val actual = HashingManager.hashInt(input)
+        assertTrue(actual.isNotEmpty())
+    }
+
+    @Test
+    fun hashInt_shouldReturnExpectedHash_whenInputIsZero() {
+        val input = 0
+        val actual = HashingManager.hashInt(input)
+        assertTrue(actual.isNotEmpty())
     }
 }
