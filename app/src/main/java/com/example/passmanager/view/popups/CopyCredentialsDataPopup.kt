@@ -35,8 +35,9 @@ fun CopyCredentialsDataPopupPreview() {
     CopyCredentialsDataPopup(
         credential = CredentialDO(
             platform = "Facebook",
-            email = "test@test.com",
-            password = "password"
+            emailUsername = "test@test.com",
+            password = "password",
+            otherInfo = listOf()
         ),
         onCancel = {},
         isLocked = false
@@ -87,7 +88,7 @@ fun CopyCredentialsDataPopup(
                     Text("Copy Platform Name")
                 }
                 MyElevatedButton(onClick = {
-                    clipboardManager.setText(AnnotatedString(credential.email))
+                    clipboardManager.setText(AnnotatedString(credential.emailUsername))
                 }) {
                     Text("Copy Email")
                 }

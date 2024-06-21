@@ -12,13 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.passmanager.credentialsManager
+import com.example.passmanager.dal.domain.CredentialDO
 import com.example.passmanager.view.buttons.MyElevatedButton
 
 @Preview(
@@ -37,10 +35,14 @@ import com.example.passmanager.view.buttons.MyElevatedButton
     uiMode = Configuration.UI_MODE_NIGHT_NO,
 )
 @Composable
-fun AddCredentialsPopupPreview() {
-    AddCredentialsPopup(
-        onSubmit = { platform, email, password ->
-            println("Platform: $platform, Email: $email, Password: $password")
+fun InputCredentialsPopupPreview() {
+    InputCredentialsPopup(
+        onSubmit = { credential ->
+            println("Platform: ${credential.platform}" +
+                    "Email/Username: ${credential.emailUsername}" +
+                    "Password: ${credential.password}" +
+                    "Other Info: ${credential.otherInfo.joinToString("\n")}"
+            )
         },
         onCancel = {
             println("Cancel")
@@ -50,8 +52,9 @@ fun AddCredentialsPopupPreview() {
 
 
 @Composable
-fun AddCredentialsPopup(
-    onSubmit: (platform: String, email: String, password: String) -> Unit,
+fun InputCredentialsPopup(
+    initialValues: CredentialDO = CredentialDO("", "", "", emptyList()),
+    onSubmit: (CredentialDO) -> Unit,
     onCancel: () -> Unit
 ) {
     // Constants
@@ -64,11 +67,13 @@ fun AddCredentialsPopup(
     val itemColor = MaterialTheme.colorScheme.surface
 
     // Platform
-    val platform = remember { mutableStateOf("") }
-    // Email
-    val email = remember { mutableStateOf("") }
+    val platform = remember { mutableStateOf(initialValues.platform) }
+    // Email/Username
+    val emailUsername = remember { mutableStateOf(initialValues.emailUsername) }
     // Password
-    val password = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf(initialValues.password) }
+    // Other Info
+    val otherInfo = remember { mutableStateOf(initialValues.otherInfo.joinToString("\n")) }
 
     Dialog(
         onDismissRequest = {
@@ -82,7 +87,7 @@ fun AddCredentialsPopup(
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .background(itemColor),
-            contentAlignment = Alignment.CenterStart
+            contentAlignment = Alignment.TopCenter
         ) {
             Column (
                 modifier = Modifier
@@ -90,7 +95,7 @@ fun AddCredentialsPopup(
                     .padding(itemPadding * 2),
                 verticalArrangement = Arrangement.Center
             ) {
-                OutlinedTextField(
+                OutlinedTextField( // Platform
                     value = platform.value,
                     onValueChange = {
                         platform.value = it
@@ -101,24 +106,26 @@ fun AddCredentialsPopup(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.secondary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    )
+                    ),
+                    maxLines = 1,
                 )
                 Spacer(modifier = Modifier.height(itemPadding))
-                OutlinedTextField(
-                    value = email.value,
+                OutlinedTextField( // Email/Username
+                    value = emailUsername.value,
                     onValueChange = {
-                        email.value = it
+                        emailUsername.value = it
                     },
-                    label = { Text("Email") },
+                    label = { Text("Email/Username") },
                     modifier = Modifier
                         .fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.secondary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    )
+                    ),
+                    maxLines = 1,
                 )
                 Spacer(modifier = Modifier.height(itemPadding))
-                OutlinedTextField(
+                OutlinedTextField( // Password
                     value = password.value,
                     onValueChange = {
                         password.value = it
@@ -129,7 +136,24 @@ fun AddCredentialsPopup(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.secondary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    )
+                    ),
+                    maxLines = 1,
+                )
+                Spacer(modifier = Modifier.height(itemPadding))
+                OutlinedTextField( // Other Info
+                    value = otherInfo.value,
+                    onValueChange = {
+                        otherInfo.value = it
+                    },
+                    label = { if (otherInfo.value.isEmpty()) Text("Other Info (one per line)\n(e.g. username, etc.)")
+                            else Text("Other Info") },
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                    ),
+                    minLines = 3,
                 )
                 Spacer(modifier = Modifier.height(itemPadding))
                 Row(
@@ -156,7 +180,14 @@ fun AddCredentialsPopup(
                     Spacer(modifier = Modifier.width(itemPadding))
                     MyElevatedButton(
                         onClick = {
-                            onSubmit(platform.value, email.value, password.value)
+                            onSubmit(
+                                CredentialDO(
+                                    platform = platform.value,
+                                    emailUsername = emailUsername.value,
+                                    password = password.value,
+                                    otherInfo = otherInfo.value.split("\n")
+                                )
+                            )
                         },
                         modifier = Modifier
                             //.padding(itemPadding)

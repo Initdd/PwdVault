@@ -52,8 +52,9 @@ private fun Show_preview() {
     PwdItem(
         credential = CredentialDO(
             platform = "Google",
-            email = "test@test.com",
-            password = "password"
+            emailUsername = "test@test.com",
+            password = "password",
+            otherInfo = listOf("info1", "info2")
         ),
         tryUnlock = {},
         delete = { _, _ -> },
@@ -106,7 +107,7 @@ fun PwdItem(
                     )
                 }
                 IconButton(onClick = {
-                    delete(credential.platform, credential.email)
+                    delete(credential.platform, credential.emailUsername)
                 }) {
                     Icon(
                         // delete button
@@ -188,7 +189,7 @@ fun PwdItem(
                     ) {
                         Text(
                             text = if (isLocked.value || isItemLocked.value)
-                                credential.email
+                                credential.emailUsername
                             else
                                 if (isPasswordVisible.value)
                                     credential.password

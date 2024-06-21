@@ -36,8 +36,8 @@ import com.example.passmanager.ui.theme.PassManagerTheme
 import com.example.passmanager.view.bars.TopBar
 import com.example.passmanager.view.buttons.AddPwdButton
 import com.example.passmanager.view.lists.ItemList
-import com.example.passmanager.view.popups.AddCredentialsPopup
 import com.example.passmanager.view.popups.EnterMasterPwdPopup
+import com.example.passmanager.view.popups.InputCredentialsPopup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -151,7 +151,7 @@ fun PassManagerApp() {
                     credentialsList.value = credentialsManager.getAll(masterPassword.value)
                         .filter {
                             it.platform.contains(keyword, ignoreCase = true) ||
-                            it.email.contains(keyword, ignoreCase = true)
+                            it.emailUsername.contains(keyword, ignoreCase = true)
                         }
                 }
                 ItemList(
@@ -163,7 +163,7 @@ fun PassManagerApp() {
                         } else {
                             credentialsList.value = credentialsList.value.filter {
                                 it.platform != platform ||
-                                        it.email != email
+                                it.emailUsername != email
                             }
                             credentialsManager.remove(platform, email)
                         }
@@ -174,7 +174,7 @@ fun PassManagerApp() {
                         } else {
                             toEdit = credentialsList.value.find {
                                 it.platform == credential.platform &&
-                                        it.email == credential.email
+                                        it.emailUsername == credential.emailUsername
                             }
                             showEditCredentialsPopup.value = true
                         }
@@ -190,10 +190,10 @@ fun PassManagerApp() {
 
                 // Popups
                 if (showAddPassPopup.value) {
-                    AddCredentialsPopup(
-                        onSubmit = { platform, email, password ->
+                    InputCredentialsPopup(
+                        onSubmit = { credential ->
                             credentialsManager.add(
-                                CredentialDO(platform, email, password),
+                                credential,
                                 masterPassword.value!!
                             )
                             credentialsList.value = credentialsManager.getAll(masterPassword.value)
@@ -207,15 +207,16 @@ fun PassManagerApp() {
                 }
                 if (showEditCredentialsPopup.value) {
                     if (toEdit != null) {
-                        AddCredentialsPopup(
-                            onSubmit = { platform, email, password ->
+                        InputCredentialsPopup(
+                            onSubmit = { credential ->
                                 credentialsManager.update(
                                     toEdit!!.platform,
-                                    toEdit!!.email,
-                                    CredentialDO(
-                                        platform.ifEmpty { toEdit!!.platform },
-                                        email.ifEmpty { toEdit!!.email },
-                                        password.ifEmpty { toEdit!!.password }
+                                    toEdit!!.emailUsername,
+                                    credential.copy( // if empty, keep the old value
+                                        platform = credential.platform.ifEmpty { toEdit!!.platform },
+                                        emailUsername = credential.emailUsername.ifEmpty { toEdit!!.emailUsername },
+                                        password = credential.password.ifEmpty { toEdit!!.password },
+                                        otherInfo = credential.otherInfo.ifEmpty { toEdit!!.otherInfo }
                                     ),
                                     masterPassword.value!!
                                 )

@@ -16,9 +16,13 @@ class CredentialsManager (
 ) {
 
     fun add(credentialDO: CredentialDO, masterPasswordDO: MasterPasswordDO): Boolean {
+        // check if the platform or the email are empty
+        if (credentialDO.platform.isEmpty() || credentialDO.emailUsername.isEmpty()) {
+            return false
+        }
         // check if the platform and email already exist
         storage.retrieveAll().forEach {
-            if (it.platform == credentialDO.platform && it.email == credentialDO.email) {
+            if (it.platform == credentialDO.platform && it.emailUsername == credentialDO.emailUsername) {
                 return false
             }
         }
@@ -53,7 +57,7 @@ class CredentialsManager (
 
     fun get(platform: String, email: String): CredentialDO? {
         return storage.retrieveAll()
-            .filter { it.platform == platform && it.email == email }
+            .filter { it.platform == platform && it.emailUsername == email }
             .map { CredentialMapper.toDomain(it) }
             .firstOrNull()
     }
@@ -69,17 +73,19 @@ class CredentialsManager (
         }
     }
 
-    fun remove(platform: String, email: String) {
+    fun remove(platform: String, email: String): Boolean {
         // Remove all credentials with the same platform and email
         val keysToRemove = mutableListOf<Int>()
         storage.retrieveAll().forEachIndexed { k, v ->
-            if (v.platform == platform && v.email == email) {
+            if (v.platform == platform && v.emailUsername == email) {
                 keysToRemove.add(k)
             }
         }
+        if (keysToRemove.isEmpty()) return false
         keysToRemove.forEach { key ->
             storage.delete(key)
         }
+        return true
     }
 
     fun deleteAll() {
@@ -88,7 +94,7 @@ class CredentialsManager (
 
     fun update(oldPlatform: String, oldEmail: String, newCredential: CredentialDO, masterPasswordDO: MasterPasswordDO): Boolean {
         val credentials = storage.retrieveAll()
-        val idx = credentials.indexOfFirst { it.platform == oldPlatform && it.email == oldEmail }
+        val idx = credentials.indexOfFirst { it.platform == oldPlatform && it.emailUsername == oldEmail }
         if (idx == -1) {
             return false
         }

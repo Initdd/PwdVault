@@ -13,6 +13,8 @@ class MasterPasswordManager (
     private val file: File
 ) {
 
+    private val defaultMasterPwd = "123"
+
     init {
         // Check if the file exists and create it if it doesn't
         if (!file.exists()) file.createNewFile()
@@ -34,7 +36,7 @@ class MasterPasswordManager (
         val encryptedPasswordList: List<MasterPasswordDT> = storageManager.retrieveAll()
         // If the list is empty, save and return an empty password
         val encryptedPassword = if (encryptedPasswordList.isEmpty()) {
-            val emptyPassword = MasterPasswordDO("")
+            val emptyPassword = MasterPasswordDO(defaultMasterPwd)
             set(emptyPassword)
             MasterPasswordMapper.toDTO(emptyPassword)
         }
@@ -45,8 +47,6 @@ class MasterPasswordManager (
 
     fun check(password: MasterPasswordDO): Boolean {
         val encryptedPassword = get()
-        println("Encrypted password: ${encryptedPassword.password}")
-        println("Password: ${password.password}")
         return hash(password.password) == encryptedPassword.password
     }
 
