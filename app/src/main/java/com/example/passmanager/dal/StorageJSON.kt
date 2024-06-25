@@ -1,8 +1,8 @@
 package com.example.passmanager.dal
 
-import kotlinx.serialization.*
-import kotlinx.serialization.builtins.ListSerializer
-import kotlinx.serialization.json.*
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.File
 
 
@@ -18,7 +18,10 @@ inline fun <reified T> loadFromFile(file: File): List<T> {
 inline fun <reified T> saveToFile(file: File, data: List<T>) {
     val content = Json.encodeToString<List<T>>(data)
     file.writeText(content)
-    println("Data saved to file:\n$content")
+}
+
+fun saveStringToFile(file: File, data: String) {
+    file.writeText(data)
 }
 
 /**

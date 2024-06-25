@@ -38,7 +38,6 @@ class CredentialsManager (
     fun getAll(masterPasswordDO: MasterPasswordDO?): List<CredentialDO> {
         return storage.retrieveAll().map {
             if (masterPasswordDO == null) {
-                println("masterPasswordDO is null")
                 return@map CredentialMapper.toDomain(it)
             }
             try {
@@ -49,7 +48,6 @@ class CredentialsManager (
                 )
             } catch (e: Exception) {
                 // If the password cannot be decrypted, return the original credential list not decrypted
-                println("Error decrypting password")
                 CredentialMapper.toDomain(it)
             }
         }
@@ -106,6 +104,11 @@ class CredentialsManager (
                 )
             )
         )
+    }
+
+    fun updateAll(list: List<CredentialDO>, masterPasswordDO: MasterPasswordDO): Boolean {
+        storage.deleteAll()
+        return list.all { add(it, masterPasswordDO) }
     }
 
     fun saveCredToFile() {
