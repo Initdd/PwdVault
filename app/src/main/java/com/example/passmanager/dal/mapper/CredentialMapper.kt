@@ -5,14 +5,14 @@ import com.example.passmanager.dal.dto.CredentialDT
 
 object CredentialMapper {
 
-    private const val DELIMITER = ""
+    private const val DELIMITER = "\n"
 
     fun toDomain(dto: CredentialDT): CredentialDO {
         return CredentialDO(
             platform = dto.platform,
             emailUsername = dto.emailUsername,
             password = dto.password,
-            otherInfo = dto.otherInfo.split(DELIMITER)
+            otherInfo = dto.otherInfo.trim().split(DELIMITER).filter { it.isNotEmpty() }
         )
     }
 
