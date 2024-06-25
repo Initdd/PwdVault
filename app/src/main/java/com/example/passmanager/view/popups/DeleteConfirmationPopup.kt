@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -74,30 +76,42 @@ fun DeleteConfirmationPopup(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                MyTitleText(text = "Confirm deletion")
-                Spacer(modifier = Modifier.padding(8.dp))
-                Text(
-                    text = AnnotatedString("Are you sure you want to delete $toDeleteStr?"),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Spacer(modifier = Modifier.padding(16.dp))
-                MyElevatedButton(
-                    onClick = {
-                        onDelete()
-                    },
-                    primaryColor = MaterialTheme.colorScheme.error,
-                    backgroundColor = MaterialTheme.colorScheme.errorContainer
+                Column (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    Text("Delete")
+                    MyTitleText(text = "Confirm deletion")
+                    Spacer(modifier = Modifier.padding(8.dp))
+                    Text(
+                        text = AnnotatedString("Are you sure you want to delete $toDeleteStr?"),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
-                Spacer(modifier = Modifier.padding(8.dp))
-                MyElevatedButton(
-                    onClick = {
-                        onCancel()
-                    }
+                Column (
+                    verticalArrangement = Arrangement.Bottom
                 ) {
-                    Text("Cancel")
+                    Spacer(modifier = Modifier.padding(16.dp))
+                    MyElevatedButton(
+                        onClick = {
+                            onDelete()
+                        },
+                        primaryColor = MaterialTheme.colorScheme.error,
+                        backgroundColor = MaterialTheme.colorScheme.errorContainer
+                    ) {
+                        Text("Delete")
+                    }
+                    Spacer(modifier = Modifier.padding(8.dp))
+                    MyElevatedButton(
+                        onClick = {
+                            onCancel()
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
                 }
             }
         }

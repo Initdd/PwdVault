@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -78,11 +79,14 @@ fun PwdItem(
     // Colors
     val lockedCardColor = MaterialTheme.colorScheme.outline
     val unlockedCardColor = MaterialTheme.colorScheme.secondary
+    // values
+    val middleFieldNum = credential.otherInfo.size + (credential.emailUsername != "").compareTo(false)
 
     // Mutable States
     val isPasswordVisible = remember { mutableStateOf(false) }
     val isItemLocked = remember { mutableStateOf(true) }
     val showCopyCredentialsDataPopup = remember { mutableStateOf(false) }
+    val middleFieldIdx = remember { mutableIntStateOf(0) }
 
     // Clipboard Manager
     val clipboardManager = LocalClipboardManager.current
@@ -96,6 +100,7 @@ fun PwdItem(
             Row {
                 IconButton(onClick = {
                     edit(credential)
+                    middleFieldIdx.intValue = 0
                 }) {
                     Icon(
                         // edit button
@@ -121,6 +126,12 @@ fun PwdItem(
             }
         },
         onClick = {
+            println("middleFieldNum: $middleFieldNum")
+            if (middleFieldNum > 0) {
+                middleFieldIdx.intValue = (middleFieldIdx.intValue + 1) % middleFieldNum
+            }
+        },
+        onLongClick = {
             showCopyCredentialsDataPopup.value = true
         }
     ) {
@@ -188,8 +199,18 @@ fun PwdItem(
 
                     ) {
                         Text(
-                            text = if (isLocked.value || isItemLocked.value)
-                                credential.emailUsername
+                            text = if (isLocked.value || isItemLocked.value) {
+                                val isEmailUsernameEmpty = credential.emailUsername == ""
+                                if (middleFieldIdx.intValue == 0 && !isEmailUsernameEmpty) {
+                                    credential.emailUsername
+                                } else if (credential.otherInfo.isNotEmpty()) {
+                                    val idx = if (isEmailUsernameEmpty)
+                                        middleFieldIdx.intValue
+                                    else
+                                        middleFieldIdx.intValue - 1
+                                    credential.otherInfo[idx]
+                                } else ""
+                            }
                             else
                                 if (isPasswordVisible.value)
                                     credential.password

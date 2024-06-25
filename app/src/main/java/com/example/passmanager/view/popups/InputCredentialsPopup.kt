@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -37,16 +39,8 @@ import com.example.passmanager.view.buttons.MyElevatedButton
 @Composable
 fun InputCredentialsPopupPreview() {
     InputCredentialsPopup(
-        onSubmit = { credential ->
-            println("Platform: ${credential.platform}" +
-                    "Email/Username: ${credential.emailUsername}" +
-                    "Password: ${credential.password}" +
-                    "Other Info: ${credential.otherInfo.joinToString("\n")}"
-            )
-        },
-        onCancel = {
-            println("Cancel")
-        }
+        onSubmit = {},
+        onCancel = {}
     )
 }
 
@@ -86,7 +80,8 @@ fun InputCredentialsPopup(
                 .padding(padding, dialogVerticalPadding)
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(itemColor),
+                .background(itemColor)
+                .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.TopCenter
         ) {
             Column (
@@ -95,73 +90,84 @@ fun InputCredentialsPopup(
                     .padding(itemPadding * 2),
                 verticalArrangement = Arrangement.Center
             ) {
-                OutlinedTextField( // Platform
-                    value = platform.value,
-                    onValueChange = {
-                        platform.value = it
-                    },
-                    label = { Text("Platform") },
+                Column (
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    ),
-                    maxLines = 1,
-                )
-                Spacer(modifier = Modifier.height(itemPadding))
-                OutlinedTextField( // Email/Username
-                    value = emailUsername.value,
-                    onValueChange = {
-                        emailUsername.value = it
-                    },
-                    label = { Text("Email/Username") },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    ),
-                    maxLines = 1,
-                )
-                Spacer(modifier = Modifier.height(itemPadding))
-                OutlinedTextField( // Password
-                    value = password.value,
-                    onValueChange = {
-                        password.value = it
-                    },
-                    label = { Text("Password") },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    ),
-                    maxLines = 1,
-                )
-                Spacer(modifier = Modifier.height(itemPadding))
-                OutlinedTextField( // Other Info
-                    value = otherInfo.value,
-                    onValueChange = {
-                        otherInfo.value = it
-                    },
-                    label = { if (otherInfo.value.isEmpty()) Text("Other Info (one per line)\n(e.g. username, etc.)")
-                            else Text("Other Info") },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    ),
-                    minLines = 3,
-                )
-                Spacer(modifier = Modifier.height(itemPadding))
+                        .fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        // Platform
+                        value = platform.value,
+                        onValueChange = {
+                            platform.value = it
+                        },
+                        label = { Text("Platform") },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                        ),
+                        maxLines = 1,
+                    )
+                    Spacer(modifier = Modifier.height(itemPadding))
+                    OutlinedTextField(
+                        // Email/Username
+                        value = emailUsername.value,
+                        onValueChange = {
+                            emailUsername.value = it
+                        },
+                        label = { Text("Email/Username") },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                        ),
+                        maxLines = 1,
+                    )
+                    Spacer(modifier = Modifier.height(itemPadding))
+                    OutlinedTextField(
+                        // Password
+                        value = password.value,
+                        onValueChange = {
+                            password.value = it
+                        },
+                        label = { Text("Password") },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                        ),
+                        maxLines = 1,
+                    )
+                    Spacer(modifier = Modifier.height(itemPadding))
+                    OutlinedTextField(
+                        // Other Info
+                        value = otherInfo.value,
+                        onValueChange = {
+                            otherInfo.value = it
+                        },
+                        label = {
+                            if (otherInfo.value.isEmpty()) Text("Other Info (one per line)\n(e.g. username, etc.)")
+                            else Text("Other Info")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                        ),
+                        minLines = 3,
+                    )
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(itemPadding),
                     horizontalArrangement = Arrangement.End
                 ) {
+                    Spacer(modifier = Modifier.height(itemPadding))
                     MyElevatedButton(
                         onClick = {
                             onCancel()
@@ -185,7 +191,7 @@ fun InputCredentialsPopup(
                                     platform = platform.value,
                                     emailUsername = emailUsername.value,
                                     password = password.value,
-                                    otherInfo = otherInfo.value.split("\n")
+                                    otherInfo = otherInfo.value.split("\n").map { it.trim() }
                                 )
                             )
                         },

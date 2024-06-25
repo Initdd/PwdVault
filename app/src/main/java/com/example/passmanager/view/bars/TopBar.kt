@@ -1,7 +1,5 @@
 package com.example.passmanager.view.bars
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -22,11 +20,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
-import com.example.passmanager.SettingsActivity
 
 @Composable
-fun TopBar(ctx: Context, search: (keyword: String) -> Unit) {
+fun TopBar(
+    onClick: () -> Unit,
+    search: (keyword: String) -> Unit
+) {
 
     val text = remember { mutableStateOf("") }
 
@@ -57,9 +56,7 @@ fun TopBar(ctx: Context, search: (keyword: String) -> Unit) {
             )
             IconButton(
                 onClick = {
-                    // Start settings activity
-                    val intent = Intent(ctx, SettingsActivity::class.java)
-                    ContextCompat.startActivity(ctx, intent, null)
+                    onClick()
                 },
                 colors = IconButtonDefaults.iconButtonColors(
                     contentColor = MaterialTheme.colorScheme.primary

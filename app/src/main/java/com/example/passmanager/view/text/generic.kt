@@ -1,6 +1,9 @@
 package com.example.passmanager.view.text
 
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -20,7 +23,15 @@ import androidx.compose.ui.unit.dp
 )
 @Composable
 fun TextPreview() {
-    MyTitleText("My Title")
+    Column {
+        MyTitleText("My Title")
+        Box(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            ClickableText(text = "Clickable text") {}
+        }
+    }
 }
 
 @Composable
@@ -34,5 +45,22 @@ fun MyTitleText(text: String) {
             .fillMaxWidth(),
         fontWeight = FontWeight.Bold,
         color = MaterialTheme.colorScheme.primary
+    )
+}
+
+@Composable
+fun ClickableText(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: ()-> Unit,
+) {
+    Text(
+        text = text,
+        textAlign = TextAlign.Start,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier.clickable { onClick() },
+        fontWeight = FontWeight.Bold,
+        fontStyle = FontStyle.Normal,
+        style = MaterialTheme.typography.bodyLarge
     )
 }

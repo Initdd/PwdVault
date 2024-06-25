@@ -1,7 +1,9 @@
 package dev.obvionaoe.compose.swipeablecard
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
@@ -35,9 +38,38 @@ import androidx.wear.compose.material.swipeable
 import com.example.passmanager.R
 import dev.obvionaoe.compose.swipeablecard.Util.isNotNull
 import dev.obvionaoe.compose.swipeablecard.Util.isNull
-import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalWearMaterialApi::class)
+@Preview
+@Composable
+fun SwipeableCardPreview() {
+    SwipeableCard(
+        onClick = {},
+        onLongClick = {},
+        startAction = {
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primary)
+                    .fillMaxHeight()
+            )
+        },
+        endAction = {
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primary)
+                    .fillMaxHeight()
+            )
+        },
+        content = {
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primary)
+                    .fillMaxHeight()
+            )
+        }
+    )
+}
 
 private enum class SwipeableType {
     Start,
@@ -57,10 +89,13 @@ private object Util {
 }
 
 
-@OptIn(ExperimentalWearMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalWearMaterialApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun SwipeableCard(
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     shape: Shape = RoundedCornerShape(16.dp),
@@ -102,6 +137,15 @@ fun SwipeableCard(
                 color = MaterialTheme.colorScheme.secondary,
                 shape = shape
             )
+            .combinedClickable(
+                onClick = {
+//                    coroutineScope.launch {
+//                        swipeableState.animateTo(0)
+//                    }
+                    onClick()
+                },
+                onLongClick = onLongClick,
+            )
     ) {
         startAction?.let {
             Box(
@@ -118,25 +162,20 @@ fun SwipeableCard(
             )
         }
         Card(
-            onClick = {
-                coroutineScope.launch {
-                    swipeableState.animateTo(0)
-                }
-                onClick()
-            },
             modifier = modifier
                 .fillMaxHeight()
                 .offset {
                     IntOffset(swipeableState.offset.value.roundToInt(), 0)
                 },
-            enabled = enabled,
+            //onClick = {},
+            //enabled = enabled,
             shape = shape,
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.background
             ),
             elevation = elevation,
             border = border,
-            interactionSource = interactionSource,
+            //interactionSource = interactionSource,
             content = content
         )
     }

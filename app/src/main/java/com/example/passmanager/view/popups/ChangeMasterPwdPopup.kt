@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -35,6 +38,10 @@ import com.example.passmanager.view.buttons.MyElevatedButton
 )
 @Composable
 fun ChangeMasterPwdPopupPreview() {
+    ChangeMasterPwdPopup(
+        onConfirm = { _, _ -> },
+        onCancel = {}
+    )
 }
 
 @Composable
@@ -73,72 +80,85 @@ fun ChangeMasterPwdPopup(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                OutlinedTextField(
-                    value = oldPwdInput.value,
-                    onValueChange = {
-                        oldPwdInput.value = it
-                    },
-                    label = { Text("Old Password") },
+                Column (
                     modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-                Spacer(modifier = Modifier.padding(8.dp))
-                OutlinedTextField(
-                    value = newPwdInput.value,
-                    onValueChange = {
-                        newPwdInput.value = it
-                    },
-                    label = { Text("New Password") },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-                Spacer(modifier = Modifier.padding(8.dp))
-                OutlinedTextField(
-                    value = confirmPwdInput.value,
-                    onValueChange = {
-                        confirmPwdInput.value = it
-                    },
-                    label = { Text("Confirm Password") },
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-                Spacer(modifier = Modifier.padding(16.dp))
-                MyElevatedButton(
-                    onClick = {
-                        if (newPwdInput.value.isEmpty() || confirmPwdInput.value.isEmpty() || oldPwdInput.value.isEmpty()) {
-                            return@MyElevatedButton
-                        }
-                        if (newPwdInput.value != confirmPwdInput.value) {
-                            return@MyElevatedButton
-                        }
-                        onConfirm(MasterPasswordDO(oldPwdInput.value), MasterPasswordDO(newPwdInput.value))
-                    },
-                    primaryColor = MaterialTheme.colorScheme.primary,
-                    backgroundColor = MaterialTheme.colorScheme.background
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    Text("Change")
+                    OutlinedTextField(
+                        value = oldPwdInput.value,
+                        onValueChange = {
+                            oldPwdInput.value = it
+                        },
+                        label = { Text("Old Password") },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                    Spacer(modifier = Modifier.padding(8.dp))
+                    OutlinedTextField(
+                        value = newPwdInput.value,
+                        onValueChange = {
+                            newPwdInput.value = it
+                        },
+                        label = { Text("New Password") },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                    Spacer(modifier = Modifier.padding(8.dp))
+                    OutlinedTextField(
+                        value = confirmPwdInput.value,
+                        onValueChange = {
+                            confirmPwdInput.value = it
+                        },
+                        label = { Text("Confirm Password") },
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
                 }
-                Spacer(modifier = Modifier.padding(8.dp))
-                MyElevatedButton(
-                    onClick = {
-                        onCancel()
-                    },
-                    primaryColor = MaterialTheme.colorScheme.primary,
-                    backgroundColor = MaterialTheme.colorScheme.background
+                Column (
+                    verticalArrangement = Arrangement.Bottom
                 ) {
-                    Text("Cancel")
+                    Spacer(modifier = Modifier.padding(16.dp))
+                    MyElevatedButton(
+                        onClick = {
+                            if (newPwdInput.value.isEmpty() || confirmPwdInput.value.isEmpty() || oldPwdInput.value.isEmpty()) {
+                                return@MyElevatedButton
+                            }
+                            if (newPwdInput.value != confirmPwdInput.value) {
+                                return@MyElevatedButton
+                            }
+                            onConfirm(
+                                MasterPasswordDO(oldPwdInput.value),
+                                MasterPasswordDO(newPwdInput.value)
+                            )
+                        },
+                        primaryColor = MaterialTheme.colorScheme.primary,
+                        backgroundColor = MaterialTheme.colorScheme.background
+                    ) {
+                        Text("Change")
+                    }
+                    Spacer(modifier = Modifier.padding(8.dp))
+                    MyElevatedButton(
+                        onClick = {
+                            onCancel()
+                        },
+                        primaryColor = MaterialTheme.colorScheme.primary,
+                        backgroundColor = MaterialTheme.colorScheme.background
+                    ) {
+                        Text("Cancel")
+                    }
                 }
             }
         }

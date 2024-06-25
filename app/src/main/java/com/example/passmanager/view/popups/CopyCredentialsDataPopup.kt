@@ -5,13 +5,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.RemoveRedEye
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -21,7 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.passmanager.dal.domain.CredentialDO
+import com.example.passmanager.ui.theme.PassManagerTheme
 import com.example.passmanager.view.buttons.MyElevatedButton
+import com.example.passmanager.view.text.ClickableText
 import com.example.passmanager.view.text.MyTitleText
 
 // Preview function for the Composable
@@ -32,16 +43,18 @@ import com.example.passmanager.view.text.MyTitleText
 )
 @Composable
 fun CopyCredentialsDataPopupPreview() {
-    CopyCredentialsDataPopup(
-        credential = CredentialDO(
-            platform = "Facebook",
-            emailUsername = "test@test.com",
-            password = "password",
-            otherInfo = listOf()
-        ),
-        onCancel = {},
-        isLocked = false
-    )
+    PassManagerTheme {
+        CopyCredentialsDataPopup(
+            credential = CredentialDO(
+                platform = "Facebook",
+                emailUsername = "test@test.com",
+                password = "password",
+                otherInfo = listOf()
+            ),
+            onCancel = {},
+            isLocked = false
+        )
+    }
 }
 
 @Composable
@@ -59,6 +72,9 @@ fun CopyCredentialsDataPopup(
 
     // Setup the clipboard manager
     val clipboardManager = LocalClipboardManager.current
+
+    // visible password state
+    val isPwdVisible = remember { mutableStateOf(false) }
 
     Dialog(
         onDismissRequest = {
@@ -80,34 +96,70 @@ fun CopyCredentialsDataPopup(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                MyTitleText(text = "Copy Credentials")
-                Spacer(modifier = Modifier.padding(16.dp))
-                MyElevatedButton(onClick = {
-                    clipboardManager.setText(AnnotatedString(credential.platform))
-                }) {
-                    Text("Copy Platform Name")
-                }
-                MyElevatedButton(onClick = {
-                    clipboardManager.setText(AnnotatedString(credential.emailUsername))
-                }) {
-                    Text("Copy Email")
-                }
-                if (!isLocked) {
-                    MyElevatedButton(onClick = {
-                        clipboardManager.setText(AnnotatedString(credential.password))
-                    }) {
-                        Text("Copy Password")
+                Column (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    MyTitleText(text = "Copy Credentials")
+                    Spacer(modifier = Modifier.padding(16.dp))
+                    ClickableText(
+                        text = credential.platform,
+                        onClick = {
+                            clipboardManager.setText(AnnotatedString(credential.platform))
+                        }
+                    )
+                    if (credential.emailUsername.isNotEmpty()) {
+                        Spacer(modifier = Modifier.padding(16.dp))
+                        ClickableText(
+                            text = credential.emailUsername,
+                            onClick = {
+                                clipboardManager.setText(AnnotatedString(credential.emailUsername))
+                            }
+                        )
+                    }
+                    if (!isLocked) {
+                        Spacer(modifier = Modifier.padding(8.dp))
+                        Row (
+                            modifier = Modifier.fillMaxWidth()
+                        ){
+                            ClickableText(
+                                text = if (isPwdVisible.value) credential.password else credential.password.replace(
+                                    Regex("."),
+                                    "*"
+                                ),
+                                onClick = {
+                                    clipboardManager.setText(AnnotatedString(credential.password))
+                                },
+                                modifier = Modifier
+                                    .align(Alignment.CenterVertically)
+                            )
+                            IconButton(
+                                onClick = {
+                                    isPwdVisible.value = !isPwdVisible.value
+                                },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.RemoveRedEye,
+                                    contentDescription = "Copy password"
+                                )
+                            }
+                        }
                     }
                 }
-                Spacer(modifier = Modifier.padding(16.dp))
-                MyElevatedButton(
-                    onClick = {
-                        onCancel()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(0.5f)
+                Column (
+                    verticalArrangement = Arrangement.Bottom
                 ) {
-                    Text("Back")
+                    Spacer(modifier = Modifier.padding(8.dp))
+                    MyElevatedButton(
+                        onClick = {
+                            onCancel()
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                    ) {
+                        Text("Back")
+                    }
                 }
             }
         }
