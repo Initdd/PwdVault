@@ -1,6 +1,7 @@
 package com.example.passmanager
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.content.ContextCompat
 import com.example.passmanager.control.CredentialsManager
 import com.example.passmanager.control.MasterPasswordManager
 import com.example.passmanager.control.ThemeModeManager
@@ -136,6 +138,7 @@ fun PassManagerApp() {
 
     val masterPassword = remember { mutableStateOf<MasterPasswordDO?>(null) }
     var toEdit: CredentialDO? = null
+    val ctx = LocalContext.current
 
     PassManagerTheme(
         darkTheme = themeMode.value == ThemeModeDO.DARK
@@ -147,13 +150,20 @@ fun PassManagerApp() {
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.Top
             ) {
-                TopBar(LocalContext.current) { keyword ->
-                    credentialsList.value = credentialsManager.getAll(masterPassword.value)
-                        .filter {
-                            it.platform.contains(keyword, ignoreCase = true) ||
-                            it.emailUsername.contains(keyword, ignoreCase = true)
-                        }
-                }
+                TopBar(
+                    onClick = {
+                        // Start settings activity
+                        val intent = Intent(ctx, SettingsActivity::class.java)
+                        ContextCompat.startActivity(ctx, intent, null)
+                    },
+                    search = { keyword ->
+                        credentialsList.value = credentialsManager.getAll(masterPassword.value)
+                            .filter {
+                                it.platform.contains(keyword, ignoreCase = true) ||
+                                it.emailUsername.contains(keyword, ignoreCase = true)
+                            }
+                    }
+                )
                 ItemList(
                     list = credentialsList,
                     unlock = { showEnterMasterPwdPopup.value = true },
@@ -208,6 +218,7 @@ fun PassManagerApp() {
                 if (showEditCredentialsPopup.value) {
                     if (toEdit != null) {
                         InputCredentialsPopup(
+                            initialValues = toEdit!!,
                             onSubmit = { credential ->
                                 credentialsManager.update(
                                     toEdit!!.platform,
