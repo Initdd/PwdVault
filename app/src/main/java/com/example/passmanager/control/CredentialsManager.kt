@@ -106,6 +106,18 @@ class CredentialsManager (
         )
     }
 
+    fun reencryptAll(oldMasterPasswordDO: MasterPasswordDO, newMasterPasswordDO: MasterPasswordDO): Boolean {
+        val credentials = storage.retrieveAll()
+        val updatedCredentials = credentials.map {
+            CredentialMapper.toDomain(
+                it.copy(
+                    password = EncryptionManager.decrypt(oldMasterPasswordDO.password, it.password)
+                )
+            )
+        }
+        return updateAll(updatedCredentials, newMasterPasswordDO)
+    }
+
     fun updateAll(list: List<CredentialDO>, masterPasswordDO: MasterPasswordDO): Boolean {
         storage.deleteAll()
         return list.all { add(it, masterPasswordDO) }

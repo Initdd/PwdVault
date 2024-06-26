@@ -29,6 +29,8 @@ import com.example.passmanager.view.buttons.MySwitch
 import com.example.passmanager.view.cards.MyElevatedCard
 import com.example.passmanager.view.popups.ChangeMasterPwdPopup
 import com.example.passmanager.view.popups.DeleteConfirmationPopup
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 
 
 class SettingsActivity : ComponentActivity() {
@@ -51,6 +53,8 @@ fun SettingsPage() {
 
     val showDeleteConfirmationPopup = remember { mutableStateOf(false) }
     val showChangeMasterPwdPopup = remember { mutableStateOf(false) }
+
+    val scope = CoroutineScope(Dispatchers.IO)
 
     PassManagerTheme(
         darkTheme = themeMode.value == ThemeModeDO.DARK
@@ -141,6 +145,7 @@ fun SettingsPage() {
                 onConfirm = { oldMasterPassword, newMasterPassword ->
                     if (masterPasswordManager.check(oldMasterPassword)) {
                         masterPasswordManager.set(newMasterPassword)
+                        credentialsManager.reencryptAll(oldMasterPassword, newMasterPassword)
                         masterPasswordManager.saveMPToFile()
                         showChangeMasterPwdPopup.value = false
                     }
