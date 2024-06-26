@@ -56,7 +56,6 @@ lateinit var masterPasswordManager: MasterPasswordManager
 lateinit var credentialsManager: CredentialsManager
 
 // Global
-val scope = CoroutineScope(Dispatchers.IO)
 lateinit var credentialsList: MutableState<List<CredentialDO>>
 lateinit var themeMode: MutableState<ThemeModeDO>
 lateinit var isLocked: MutableState<Boolean>
@@ -139,6 +138,8 @@ fun PassManagerApp() {
     val masterPassword = remember { mutableStateOf<MasterPasswordDO?>(null) }
     var toEdit: CredentialDO? = null
     val ctx = LocalContext.current
+    val scope = CoroutineScope(Dispatchers.IO)
+
 
     PassManagerTheme(
         darkTheme = themeMode.value == ThemeModeDO.DARK
