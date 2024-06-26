@@ -1,5 +1,6 @@
 package com.example.passmanager.view.bars
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -19,7 +20,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+
+@Preview(
+    device = "spec:width=2280px,height=1080px,orientation=portrait",
+    showBackground = true, showSystemUi = true,
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+)
+@Composable
+fun TopBarPreview() {
+    TopBar(onClick = {}, search = {})
+}
 
 @Composable
 fun TopBar(
@@ -32,6 +44,7 @@ fun TopBar(
     Box (
         modifier = Modifier
             .padding(16.dp)
+            .padding(top = 24.dp)
             .fillMaxWidth()
     ){
         Row(
