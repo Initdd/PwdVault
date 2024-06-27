@@ -1,4 +1,4 @@
-# PassManager
+# PwdVault
 
 <html>
 <div style="overflow-x: auto; white-space: nowrap; display: flex; justify-content: left; align-items: left;">
@@ -10,7 +10,7 @@
 
 ## Overview
 
-PassManager is a password management application developed in Kotlin for Android devices.
+PwdVault is a password management application developed in Kotlin for Android devices.
 It allows users to securely store and manage their credentials for various platforms.
 
 ## Features
@@ -35,7 +35,7 @@ You can also download the APK from the [releases](https://github.com/Initdd/PwdV
 
 ### Installing
 
-1. Clone the repository: `git clone https://github.com/Initdd/PassManager.git`
+1. Clone the repository: `git clone https://github.com/Initdd/PwdVault`
 2. Open the project in Android Studio.
 3. Run the application on your emulator or real device.
 
