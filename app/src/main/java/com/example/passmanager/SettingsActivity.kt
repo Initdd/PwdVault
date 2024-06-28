@@ -31,6 +31,7 @@ import com.example.passmanager.view.popups.ChangeMasterPwdPopup
 import com.example.passmanager.view.popups.DeleteConfirmationPopup
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class SettingsActivity : ComponentActivity() {
@@ -112,7 +113,7 @@ fun SettingsPage() {
                                 ThemeModeDO.LIGHT
                             }
                             themeModeManager.setTheme(themeMode.value)
-                            themeModeManager.saveTMToFile()
+                            scope.launch { themeModeManager.saveTMToFile() }
                         }
                     }
                 }
@@ -144,9 +145,14 @@ fun SettingsPage() {
             ChangeMasterPwdPopup(
                 onConfirm = { oldMasterPassword, newMasterPassword ->
                     if (masterPasswordManager.check(oldMasterPassword)) {
+                        // Update the master password
                         masterPasswordManager.set(newMasterPassword)
                         credentialsManager.reencryptAll(oldMasterPassword, newMasterPassword)
-                        masterPasswordManager.saveMPToFile()
+                        scope.launch { masterPasswordManager.saveMPToFile() }
+                        // reset the decrypted state
+                        isLocked.value = true
+                        credentialsList.value = credentialsManager.getAll(null)
+                        // close the popup
                         showChangeMasterPwdPopup.value = false
                     }
                 },

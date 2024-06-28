@@ -209,9 +209,7 @@ fun PassManagerApp() {
                             )
                             credentialsList.value = credentialsManager.getAll(masterPassword.value)
                             showAddPassPopup.value = false
-                            scope.launch {
-                                credentialsManager.saveCredToFile()
-                            }
+                            scope.launch { credentialsManager.saveCredToFile() }
                         },
                         onCancel = { showAddPassPopup.value = false }
                     )
@@ -236,9 +234,7 @@ fun PassManagerApp() {
                                 credentialsList.value =
                                     credentialsManager.getAll(masterPassword.value)
                                 showEditCredentialsPopup.value = false
-                                scope.launch {
-                                    credentialsManager.saveCredToFile()
-                                }
+                                scope.launch { credentialsManager.saveCredToFile() }
                             },
                             onCancel = {
                                 showEditCredentialsPopup.value = false
