@@ -38,10 +38,27 @@ class StorageJSONTest {
     }
 
     @Test
+    fun `store returns false when data is already stored`() {
+        val storage = StorageJSON<CustomObject>{ a, b -> a.id == b.id }
+        storage.store(CustomObject(1, "testData"))
+        val result = storage.store(CustomObject(1, "testData"))
+        assertFalse(result)
+    }
+
+    @Test
     fun `retrieve returns null when index is out of bounds`() {
         val storage = StorageJSON<CustomObject>{ a, b -> a.id == b.id }
         val result = storage.retrieve(1)
         assertNull(result)
+    }
+
+    @Test
+    fun `delete removes successfully`() {
+        val storage = StorageJSON<CustomObject>{ a, b -> a.id == b.id }
+        storage.store(CustomObject(1, "testData"))
+        val result = storage.delete(0)
+        assertEquals(0, storage.retrieveAll().size)
+        assertEquals(true, result)
     }
 
     @Test
@@ -55,6 +72,13 @@ class StorageJSONTest {
     fun `update returns false when index is out of bounds`() {
         val storage = StorageJSON<CustomObject>{ a, b -> a.id == b.id }
         val result = storage.update(1, CustomObject(1, "newData"))
+        assertFalse(result)
+    }
+
+    @Test
+    fun `update returns false when data is not stored`() {
+        val storage = StorageJSON<CustomObject>{ a, b -> a.id == b.id }
+        val result = storage.update(0, CustomObject(1, "newData"))
         assertFalse(result)
     }
 
