@@ -39,8 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.ExperimentalWearMaterialApi
 import com.example.passmanager.dal.domain.CredentialDO
 import com.example.passmanager.isLocked
+import com.example.passmanager.view.cards.SwipeableCard
 import com.example.passmanager.view.popups.CopyCredentialsDataPopup
-import dev.obvionaoe.compose.swipeablecard.SwipeableCard
 
 @SuppressLint("UnrememberedMutableState")
 @Preview(

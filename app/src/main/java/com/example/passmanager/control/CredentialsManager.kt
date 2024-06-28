@@ -60,17 +60,6 @@ class CredentialsManager (
             .firstOrNull()
     }
 
-    fun getWithPwd(platform: String, email: String, masterPasswordDO: MasterPasswordDO): CredentialDO? {
-        val credential = get(platform, email) ?: return null
-        return try {
-            credential.copy(
-                password = EncryptionManager.decrypt(masterPasswordDO.password, credential.password)
-            )
-        } catch (e: Exception) {
-            throw SecurityException("Invalid master password")
-        }
-    }
-
     fun remove(platform: String, email: String): Boolean {
         // Remove all credentials with the same platform and email
         val keysToRemove = mutableListOf<Int>()
@@ -108,12 +97,19 @@ class CredentialsManager (
 
     fun reencryptAll(oldMasterPasswordDO: MasterPasswordDO, newMasterPasswordDO: MasterPasswordDO): Boolean {
         val credentials = storage.retrieveAll()
-        val updatedCredentials = credentials.map {
-            CredentialMapper.toDomain(
-                it.copy(
-                    password = EncryptionManager.decrypt(oldMasterPasswordDO.password, it.password)
+        val updatedCredentials = try {
+            credentials.map {
+                CredentialMapper.toDomain(
+                    it.copy(
+                        password = EncryptionManager.decrypt(
+                            oldMasterPasswordDO.password,
+                            it.password
+                        )
+                    )
                 )
-            )
+            }
+        } catch (e: Exception) {
+            return false
         }
         return updateAll(updatedCredentials, newMasterPasswordDO)
     }

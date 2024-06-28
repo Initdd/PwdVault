@@ -57,7 +57,11 @@ class StorageJSON<E>(
      * @param key The key to search for in the storage list.
      * @return The data stored under the given key, or null if the key does not exist.
      */
-    override fun retrieve(key: Int): E? = storage[key]
+    override fun retrieve(key: Int): E? = try {
+        storage[key]
+    } catch (e: IndexOutOfBoundsException) {
+        null
+    }
 
     /**
      * Retrieve all data from the storage list.
@@ -75,7 +79,11 @@ class StorageJSON<E>(
      * @return True if the data was successfully deleted, false otherwise.
      */
     override fun delete(key: Int): Boolean {
-        val item = storage[key]
+        val item = try {
+            storage[key]
+        } catch (e: IndexOutOfBoundsException) {
+            return false
+        }
         if (item != null) {
             storage.remove(item)
             return true
@@ -98,11 +106,13 @@ class StorageJSON<E>(
      * @return True if the data was successfully updated, false otherwise.
      */
     override fun update(key: Int, data: E): Boolean {
-        if (storage[key] != null) {
-            storage[key] = data
-            return true
+        try {
+            storage[key]
+        } catch (e: IndexOutOfBoundsException) {
+            return false
         }
-        return false
+        storage[key] = data
+        return true
     }
 
     /**

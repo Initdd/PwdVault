@@ -2,8 +2,8 @@ package com.example.passmanager.dal.domain
 
 data class CredentialDO(
     val platform: String,
-    val password: String,
     val emailUsername: String,
+    val password: String,
     val otherInfo: List<String>,
 )
 

@@ -1,4 +1,4 @@
-package dev.obvionaoe.compose.swipeablecard
+package com.example.passmanager.view.cards
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -36,8 +36,8 @@ import androidx.wear.compose.material.SwipeableState
 import androidx.wear.compose.material.rememberSwipeableState
 import androidx.wear.compose.material.swipeable
 import com.example.passmanager.R
-import dev.obvionaoe.compose.swipeablecard.Util.isNotNull
-import dev.obvionaoe.compose.swipeablecard.Util.isNull
+import com.example.passmanager.view.cards.Util.isNotNull
+import com.example.passmanager.view.cards.Util.isNull
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalWearMaterialApi::class)
