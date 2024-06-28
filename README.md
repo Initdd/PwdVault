@@ -43,6 +43,7 @@ You can also download the APK from the [releases](https://github.com/Initdd/PwdV
 
 - [Kotlin](https://kotlinlang.org/)
 - [Gradle](https://gradle.org/)
+- [Android Jetpack](https://developer.android.com/jetpack)
 
 ## Contributing
 
