@@ -27,7 +27,7 @@ machine for development and testing purposes.
 
 You can also download the APK from the [releases](https://github.com/Initdd/PwdVault/releases) page.
 
-> ![Note]
+> [!IMPORTANT]
 > the default password for the application is `123`
 
 ### Prerequisites
