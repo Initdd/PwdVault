@@ -48,6 +48,10 @@ You can also download the APK from the [releases](https://github.com/Initdd/PwdV
 - [Gradle](https://gradle.org/)
 - [Android Jetpack](https://developer.android.com/jetpack)
 
+## Requirements
+
+- Android 9.0 (Pie) or later
+
 ## Contributing
 
 You can always contribute to this project by submitting a pull request.
