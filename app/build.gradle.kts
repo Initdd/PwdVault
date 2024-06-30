@@ -5,12 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.passmanager"
-    compileSdkVersion = "android-34"
+    namespace = "com.example.pwdvault"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.passmanager"
+        applicationId = "com.example.pwdvault"
         minSdk = 28
         targetSdk = 34
         versionCode = 1
@@ -51,6 +50,7 @@ android {
     }
     buildToolsVersion = "34.0.0"
 }
+
 
 dependencies {
 
