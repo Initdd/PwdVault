@@ -27,6 +27,9 @@ machine for development and testing purposes.
 
 You can also download the APK from the [releases](https://github.com/Initdd/PwdVault/releases) page.
 
+> ![Note]
+> the default password for the application is `123`
+
 ### Prerequisites
 
 - Android Studio Koala | 2024.1.1 or later
