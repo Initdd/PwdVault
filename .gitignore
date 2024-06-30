@@ -4,7 +4,6 @@
 /local.properties
 *.idea
 .idea/*
-/.idea
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
@@ -19,6 +18,5 @@
 local.properties
 
 tmp.*
-/.idea/
 /app/release/
 /.idea/
