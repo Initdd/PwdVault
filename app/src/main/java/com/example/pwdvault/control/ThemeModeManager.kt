@@ -18,6 +18,13 @@ class ThemeModeManager(
 
     private val defaultTheme = ThemeModeDO.LIGHT
 
+    init {
+        // check if the theme is empty
+        if (storage.retrieveAll().isEmpty()) {
+            storage.store(ThemeModeMapper.toDTO(defaultTheme))
+        }
+    }
+
     /**
      * Get the current theme mode.
      */
