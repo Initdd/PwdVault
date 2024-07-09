@@ -7,7 +7,7 @@
 PwdVault is a password management application developed in Kotlin for Android devices.
 It allows users to securely store and manage their credentials for various platforms.
 
-<html>
+<html lang="en">
 <div style="overflow-x: auto; white-space: nowrap; display: flex; justify-content: left; align-items: left;width: 100%;">
 <img src="./assets/layout/screenshot_dark_1.png" alt="drawing" width="200" style="margin-right: 10px;flex: 1;"/>
 <img src="./assets/layout/screenshot_light.png" alt="drawing" width="200" style="margin-right: 10px;flex: 1;"/>
@@ -20,6 +20,7 @@ It allows users to securely store and manage their credentials for various platf
 - Secure storage of credentials.
 - Easy retrieval of stored credentials.
 - Ability to add, edit, and delete credentials.
+- Possibility export and import credentials.
 - Dark and light theme support.
 
 ## Getting Started
