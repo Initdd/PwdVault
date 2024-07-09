@@ -8,8 +8,8 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 object EncryptionManager {
-    val IVBYTES: ByteArray = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    private val selectedEncryption = "AES/CBC/PKCS5Padding"
+    private val IVBYTES: ByteArray = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    private const val SELECTED_ENCRYPTION = "AES/CBC/PKCS5Padding"
 
     fun encrypt(key: String, data: String): String {
         if (key.isEmpty() || data.isEmpty()) {
@@ -19,7 +19,7 @@ object EncryptionManager {
         val bytes: ByteArray = key.toByteArray(StandardCharsets.UTF_8)
         instance.update(bytes, 0, bytes.size)
         val secretKeySpec = SecretKeySpec(instance.digest(), "AES")
-        val instance2 = Cipher.getInstance(selectedEncryption)
+        val instance2 = Cipher.getInstance(SELECTED_ENCRYPTION)
         instance2.init(1, secretKeySpec, IvParameterSpec(IVBYTES))
         val doFinal = instance2.doFinal(data.toByteArray(StandardCharsets.UTF_8))
         return Base64.getEncoder().encodeToString(doFinal)
@@ -34,7 +34,7 @@ object EncryptionManager {
         instance.update(bytes, 0, bytes.size)
         val secretKeySpec = SecretKeySpec(instance.digest(), "AES")
         val decode = Base64.getDecoder().decode(data)
-        val instance2 = Cipher.getInstance(selectedEncryption)
+        val instance2 = Cipher.getInstance(SELECTED_ENCRYPTION)
         instance2.init(2, secretKeySpec, IvParameterSpec(IVBYTES))
         val doFinal = instance2.doFinal(decode)
         return String(doFinal, StandardCharsets.UTF_8)

@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
-import com.example.pwdvault.SettingsActivity
 import com.example.pwdvault.control.CredentialsManager
 import com.example.pwdvault.control.MasterPasswordManager
 import com.example.pwdvault.control.ThemeModeManager

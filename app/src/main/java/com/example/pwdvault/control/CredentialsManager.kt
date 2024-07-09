@@ -7,7 +7,6 @@ import com.example.pwdvault.dal.domain.CredentialDO
 import com.example.pwdvault.dal.domain.MasterPasswordDO
 import com.example.pwdvault.dal.dto.CredentialDT
 import com.example.pwdvault.dal.encodeToString
-import com.example.pwdvault.dal.loadFromFile
 import com.example.pwdvault.dal.mapper.CredentialMapper
 import com.example.pwdvault.dal.saveToFile
 import java.io.File
@@ -126,16 +125,6 @@ class CredentialsManager (
         saveToFile<CredentialDT>(saveFile, storage.retrieveAll())
     }
 
-    private fun loadCredFromFile(loadFile: File = file, override: Boolean = false) {
-        loadFromFile<CredentialDT>(loadFile).forEach {
-            if (get(it.platform, it.emailUsername) == null || override) {
-                // delete the credential if it already exists
-                remove(it.platform, it.emailUsername)
-                storage.store(it)
-            }
-        }
-    }
-
     fun loadCredFromJsonString(jsonString: String, override: Boolean = false) {
         val credentials = decodeFromString<List<CredentialDT>>(jsonString)
         credentials.forEach {
@@ -150,9 +139,5 @@ class CredentialsManager (
     fun encodeCredentials(masterPasswordDO: MasterPasswordDO?): String {
         val credentials = getAll(masterPasswordDO).map { CredentialMapper.toDTO(it) }
         return encodeToString(credentials)
-    }
-
-    fun importCredFromFile(impFile: File, override: Boolean = false) {
-        loadCredFromFile(impFile, override)
     }
 }

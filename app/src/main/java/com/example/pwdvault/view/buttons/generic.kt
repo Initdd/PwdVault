@@ -76,7 +76,8 @@ fun MySwitch(
         targetValue = if (switchON.value)
             with(LocalDensity.current) { (width - thumbRadius - gapBetweenThumbAndTrackEdge).toPx() }
         else
-            with(LocalDensity.current) { (thumbRadius + gapBetweenThumbAndTrackEdge).toPx() }
+            with(LocalDensity.current) { (thumbRadius + gapBetweenThumbAndTrackEdge).toPx() },
+        label = "Switch Animation"
     )
 
     Canvas(

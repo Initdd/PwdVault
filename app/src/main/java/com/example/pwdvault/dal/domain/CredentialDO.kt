@@ -6,7 +6,3 @@ data class CredentialDO(
     val password: String,
     val otherInfo: List<String>,
 )
-
-fun compareCredentialDO(cred1: CredentialDO, cred2: CredentialDO): Boolean {
-    return cred1.platform == cred2.platform && cred1.emailUsername == cred2.emailUsername
-}

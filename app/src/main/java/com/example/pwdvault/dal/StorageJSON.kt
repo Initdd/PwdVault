@@ -42,7 +42,7 @@ fun saveStringToFile(file: File, data: String) {
 class StorageJSON<E>(
     private val compare: (E, E) -> Boolean
 ) : Storage<Int, E> {
-    var storage: MutableList<E> = mutableListOf()
+    private var storage: MutableList<E> = mutableListOf()
 
     /**
      * Store data in the storage list.
