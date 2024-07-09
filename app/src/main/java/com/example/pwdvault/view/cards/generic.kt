@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 fun MyElevatedCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Card(
         modifier = modifier
-            .padding(bottom = 16.dp)
+            .padding(bottom = 8.dp)
             .width(300.dp),
         shape = RoundedCornerShape(8.dp),
         elevation = CardDefaults.elevatedCardElevation(

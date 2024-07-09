@@ -183,35 +183,43 @@ fun SettingsPage() {
                 ) {
                     Text(text = "Delete all credentials")
                 }
-                MyElevatedButton(onClick = {
-                    // request permission to read and write external storage
-                    if (!gotExternalStoragePermission) {
-                        requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    } else {
-                        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                            .addCategory(Intent.CATEGORY_OPENABLE)
-                            .setType("application/json")
-                            .putExtra(Intent.EXTRA_TITLE, "credentials.json")
-                        // set the operation to export
-                        SettingsActivity.filePickerOperation = true
-                        filePickerLauncher.launch(intent)
-                    }
-                }) {
+                MyElevatedButton(
+                    onClick = {
+                        // request permission to read and write external storage
+                        if (!gotExternalStoragePermission) {
+                            requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        } else {
+                            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                                .addCategory(Intent.CATEGORY_OPENABLE)
+                                .setType("application/json")
+                                .putExtra(Intent.EXTRA_TITLE, "credentials.json")
+                            // set the operation to export
+                            SettingsActivity.filePickerOperation = true
+                            filePickerLauncher.launch(intent)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
                     Text(text = "Export credentials")
                 }
-                MyElevatedButton(onClick = {
-                    // request permission to read and write external storage
-                    if (!gotExternalStoragePermission) {
-                        requestPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                    } else {
-                        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                            .addCategory(Intent.CATEGORY_OPENABLE)
-                            .setType("application/json")
-                        // set the operation to import
-                        SettingsActivity.filePickerOperation = false
-                        filePickerLauncher.launch(intent)
-                    }
-                }) {
+                MyElevatedButton(
+                    onClick = {
+                        // request permission to read and write external storage
+                        if (!gotExternalStoragePermission) {
+                            requestPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                        } else {
+                            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                                .addCategory(Intent.CATEGORY_OPENABLE)
+                                .setType("application/json")
+                            // set the operation to import
+                            SettingsActivity.filePickerOperation = false
+                            filePickerLauncher.launch(intent)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
                     Text(text = "Import credentials")
                 }
             }
