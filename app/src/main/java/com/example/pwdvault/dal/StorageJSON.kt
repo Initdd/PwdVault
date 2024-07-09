@@ -15,6 +15,14 @@ inline fun <reified T> loadFromFile(file: File): List<T> {
     }
 }
 
+inline fun <reified T> encodeToString(data: T): String {
+    return Json.encodeToString(data)
+}
+
+inline fun <reified T> decodeFromString(data: String): T {
+    return Json.decodeFromString(data)
+}
+
 inline fun <reified T> saveToFile(file: File, data: List<T>) {
     val content = Json.encodeToString<List<T>>(data)
     file.writeText(content)
