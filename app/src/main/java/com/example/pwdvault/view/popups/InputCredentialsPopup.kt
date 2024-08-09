@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -124,6 +125,7 @@ fun InputCredentialsPopup(
                             unfocusedBorderColor = MaterialTheme.colorScheme.primary
                         ),
                         maxLines = 1,
+                        keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email)
                     )
                     Spacer(modifier = Modifier.height(itemPadding))
                     OutlinedTextField(
@@ -140,6 +142,7 @@ fun InputCredentialsPopup(
                             unfocusedBorderColor = MaterialTheme.colorScheme.primary
                         ),
                         maxLines = 1,
+                        keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Password)
                     )
                     Spacer(modifier = Modifier.height(itemPadding))
                     OutlinedTextField(
