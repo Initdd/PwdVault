@@ -24,6 +24,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -118,14 +120,14 @@ fun InputCredentialsPopup(
                             emailUsername.value = it
                         },
                         label = { Text("Email/Username") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         modifier = Modifier
                             .fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.secondary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.primary
                         ),
-                        maxLines = 1,
-                        keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Email)
                     )
                     Spacer(modifier = Modifier.height(itemPadding))
                     OutlinedTextField(
@@ -135,14 +137,15 @@ fun InputCredentialsPopup(
                             password.value = it
                         },
                         label = { Text("Password") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         modifier = Modifier
                             .fillMaxWidth(),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = MaterialTheme.colorScheme.secondary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.primary
                         ),
-                        maxLines = 1,
-                        keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Password)
                     )
                     Spacer(modifier = Modifier.height(itemPadding))
                     OutlinedTextField(
