@@ -28,8 +28,6 @@ It allows users to securely store and manage their credentials for various platf
 These instructions will get you a copy of the project up and running on your local
 machine for development and testing purposes.
 
-You can also **download** the APK from the [releases](https://github.com/Initdd/PwdVault/releases) page.
-
 > [!IMPORTANT]
 > the default password for the application is `123`
 
