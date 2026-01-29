@@ -26,8 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.pwdvault.SettingsActivity.Companion.filePickerLauncher
-import com.example.pwdvault.SettingsActivity.Companion.gotExternalStoragePermission
-import com.example.pwdvault.SettingsActivity.Companion.requestPermissionLauncher
 import com.example.pwdvault.control.file_picker.FilePickerUtils
 import com.example.pwdvault.dal.domain.ThemeModeDO
 import com.example.pwdvault.ui.theme.PassManagerTheme
@@ -44,9 +42,6 @@ class SettingsActivity : ComponentActivity() {
 
 
     companion object {
-        // Permission to read and write external storage
-        var gotExternalStoragePermission = false
-        lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
         // File picker
         lateinit var filePickerLauncher: ActivityResultLauncher<Intent>
         var filePickerOperation: Boolean? = null
@@ -54,18 +49,7 @@ class SettingsActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Ask for permission to read external storage
-        requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-                if (isGranted) {
-                    gotExternalStoragePermission = true
-                } else {
-                    Toast.makeText(
-                        this,
-                        "Cannot import and export credentials without permission",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
+        // Ask for permission to read external storage (Removed as SAF is used)
         // File picker
         filePickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -184,18 +168,13 @@ fun SettingsPage() {
                 }
                 MyElevatedButton(
                     onClick = {
-                        // request permission to read and write external storage
-                        if (!gotExternalStoragePermission) {
-                            requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                        } else {
-                            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                                .addCategory(Intent.CATEGORY_OPENABLE)
-                                .setType("application/json")
-                                .putExtra(Intent.EXTRA_TITLE, "credentials.json")
-                            // set the operation to export
-                            SettingsActivity.filePickerOperation = true
-                            filePickerLauncher.launch(intent)
-                        }
+                        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+                            .addCategory(Intent.CATEGORY_OPENABLE)
+                            .setType("application/json")
+                            .putExtra(Intent.EXTRA_TITLE, "credentials.json")
+                        // set the operation to export
+                        SettingsActivity.filePickerOperation = true
+                        filePickerLauncher.launch(intent)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -204,17 +183,12 @@ fun SettingsPage() {
                 }
                 MyElevatedButton(
                     onClick = {
-                        // request permission to read and write external storage
-                        if (!gotExternalStoragePermission) {
-                            requestPermissionLauncher.launch(android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                        } else {
-                            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                                .addCategory(Intent.CATEGORY_OPENABLE)
-                                .setType("application/json")
-                            // set the operation to import
-                            SettingsActivity.filePickerOperation = false
-                            filePickerLauncher.launch(intent)
-                        }
+                        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+                            .addCategory(Intent.CATEGORY_OPENABLE)
+                            .setType("application/json")
+                        // set the operation to import
+                        SettingsActivity.filePickerOperation = false
+                        filePickerLauncher.launch(intent)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
