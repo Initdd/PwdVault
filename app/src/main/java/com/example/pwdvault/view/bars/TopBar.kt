@@ -30,16 +30,15 @@ import androidx.compose.ui.unit.dp
 )
 @Composable
 fun TopBarPreview() {
-    TopBar(onClick = {}, search = {})
+    TopBar(onClick = {}, searchQuery = "", onSearchQueryChange = {})
 }
 
 @Composable
 fun TopBar(
     onClick: () -> Unit,
-    search: (keyword: String) -> Unit
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit
 ) {
-
-    val text = remember { mutableStateOf("") }
 
     Box (
         modifier = Modifier
@@ -53,10 +52,9 @@ fun TopBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             OutlinedTextField(
-                value = text.value,
-                onValueChange = {textValue ->
-                    text.value = textValue
-                    search(textValue)
+                value = searchQuery,
+                onValueChange = { textValue ->
+                    onSearchQueryChange(textValue)
                 },
                 label = { Text("Search") },
                 modifier = Modifier

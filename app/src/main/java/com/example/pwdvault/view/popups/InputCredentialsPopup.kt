@@ -1,13 +1,13 @@
 package com.example.pwdvault.view.popups
 
 import android.content.res.Configuration
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,6 +15,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -26,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,6 +39,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.pwdvault.dal.domain.CredentialDO
 import com.example.pwdvault.view.buttons.MyElevatedButton
+import com.example.pwdvault.view.cards.MyElevatedCard
 
 @Preview(
     device = "spec:width=2280px,height=1080px,orientation=portrait",
@@ -60,8 +67,6 @@ fun InputCredentialsPopup(
     val itemPadding = 8.dp
     val dialogVerticalPadding = padding*4
     val buttonWidth = 100.dp
-    // Colors
-    val itemColor = MaterialTheme.colorScheme.surface
 
     // Platform
     val platform = remember { mutableStateOf(initialValues.platform) }
@@ -69,6 +74,7 @@ fun InputCredentialsPopup(
     val emailUsername = remember { mutableStateOf(initialValues.emailUsername) }
     // Password
     val password = remember { mutableStateOf(initialValues.password) }
+    val passwordVisible = remember { mutableStateOf(false) }
     // Other Info
     val otherInfo = remember { mutableStateOf(initialValues.otherInfo.joinToString("\n")) }
 
@@ -78,139 +84,152 @@ fun InputCredentialsPopup(
         },
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
     ){
-        Box (
+        MyElevatedCard(
             modifier = Modifier
                 .padding(padding, dialogVerticalPadding)
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(itemColor)
-                .verticalScroll(rememberScrollState()),
-            contentAlignment = Alignment.TopCenter
         ) {
-            Column (
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(itemPadding * 2),
-                verticalArrangement = Arrangement.Center
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+                contentAlignment = Alignment.TopCenter
             ) {
                 Column (
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(itemPadding * 2),
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    OutlinedTextField(
-                        // Platform
-                        value = platform.value,
-                        onValueChange = {
-                            platform.value = it
-                        },
-                        label = { Text("Platform") },
+                    Column (
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                        ),
-                        maxLines = 1,
-                    )
-                    Spacer(modifier = Modifier.height(itemPadding))
-                    OutlinedTextField(
-                        // Email/Username
-                        value = emailUsername.value,
-                        onValueChange = {
-                            emailUsername.value = it
-                        },
-                        label = { Text("Email/Username") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                        ),
-                    )
-                    Spacer(modifier = Modifier.height(itemPadding))
-                    OutlinedTextField(
-                        // Password
-                        value = password.value,
-                        onValueChange = {
-                            password.value = it
-                        },
-                        label = { Text("Password") },
-                        singleLine = true,
-                        visualTransformation = PasswordVisualTransformation(),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                        ),
-                    )
-                    Spacer(modifier = Modifier.height(itemPadding))
-                    OutlinedTextField(
-                        // Other Info
-                        value = otherInfo.value,
-                        onValueChange = {
-                            otherInfo.value = it
-                        },
-                        label = {
-                            if (otherInfo.value.isEmpty()) Text("Other Info (one per line)\n(e.g. username, etc.)")
-                            else Text("Other Info")
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.secondary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.primary
-                        ),
-                        minLines = 3,
-                    )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(itemPadding),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    Spacer(modifier = Modifier.height(itemPadding))
-                    MyElevatedButton(
-                        onClick = {
-                            onCancel()
-                        },
-                        modifier = Modifier
-                            //.padding(itemPadding)
-                            .width(buttonWidth)
+                            .fillMaxWidth()
                     ) {
-                        Text(
-                            "Cancel",
+                        OutlinedTextField(
+                            // Platform
+                            value = platform.value,
+                            onValueChange = {
+                                platform.value = it
+                            },
+                            label = { Text("Platform") },
                             modifier = Modifier
-                                .width(buttonWidth),
-                            textAlign = TextAlign.Center
+                                .fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                            ),
+                            maxLines = 1,
+                        )
+                        Spacer(modifier = Modifier.height(itemPadding))
+                        OutlinedTextField(
+                            // Email/Username
+                            value = emailUsername.value,
+                            onValueChange = {
+                                emailUsername.value = it
+                            },
+                            label = { Text("Email/Username") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                            ),
+                        )
+                        Spacer(modifier = Modifier.height(itemPadding))
+                        OutlinedTextField(
+                            // Password
+                            value = password.value,
+                            onValueChange = {
+                                password.value = it
+                            },
+                            label = { Text("Password") },
+                            singleLine = true,
+                            visualTransformation = if (passwordVisible.value) VisualTransformation.None else PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            trailingIcon = {
+                                val image = if (passwordVisible.value)
+                                    Icons.Filled.Visibility
+                                else Icons.Filled.VisibilityOff
+
+                                IconButton(onClick = { passwordVisible.value = !passwordVisible.value }) {
+                                    Icon(imageVector = image, "Hide/Show password")
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                            ),
+                        )
+                        Spacer(modifier = Modifier.height(itemPadding))
+                        OutlinedTextField(
+                            // Other Info
+                            value = otherInfo.value,
+                            onValueChange = {
+                                otherInfo.value = it
+                            },
+                            label = {
+                                if (otherInfo.value.isEmpty()) Text("Other Info (one per line)\n(e.g. username, etc.)")
+                                else Text("Other Info")
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.secondary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.primary
+                            ),
+                            minLines = 3,
                         )
                     }
-                    Spacer(modifier = Modifier.width(itemPadding))
-                    MyElevatedButton(
-                        onClick = {
-                            onSubmit(
-                                CredentialDO(
-                                    platform = platform.value,
-                                    emailUsername = emailUsername.value,
-                                    password = password.value,
-                                    otherInfo = otherInfo.value.split("\n").map { it.trim() }
-                                )
-                            )
-                        },
+                    Row(
                         modifier = Modifier
-                            //.padding(itemPadding)
-                            .width(buttonWidth)
+                            .fillMaxWidth()
+                            .padding(itemPadding),
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Text(
-                            "Save",
+                        Spacer(modifier = Modifier.height(itemPadding))
+                        MyElevatedButton(
+                            onClick = {
+                                onCancel()
+                            },
                             modifier = Modifier
-                                .width(buttonWidth),
-                            textAlign = TextAlign.Center
-                        )
+                                //.padding(itemPadding)
+                                .width(buttonWidth)
+                        ) {
+                            Text(
+                                "Cancel",
+                                modifier = Modifier
+                                    .width(buttonWidth),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(itemPadding))
+                        MyElevatedButton(
+                            onClick = {
+                                onSubmit(
+                                    CredentialDO(
+                                        platform = platform.value,
+                                        emailUsername = emailUsername.value,
+                                        password = password.value,
+                                        otherInfo = otherInfo.value.split("\n").map { it.trim() }
+                                    )
+                                )
+                            },
+                            modifier = Modifier
+                                //.padding(itemPadding)
+                                .width(buttonWidth)
+                        ) {
+                            Text(
+                                "Save",
+                                modifier = Modifier
+                                    .width(buttonWidth),
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     }
                 }
             }

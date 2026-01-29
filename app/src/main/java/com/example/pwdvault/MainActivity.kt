@@ -17,6 +17,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
@@ -37,9 +39,15 @@ import com.example.pwdvault.dal.loadFromFile
 import com.example.pwdvault.ui.theme.PassManagerTheme
 import com.example.pwdvault.view.bars.TopBar
 import com.example.pwdvault.view.buttons.AddPwdButton
+import com.example.pwdvault.view.buttons.UnlockButton
 import com.example.pwdvault.view.lists.ItemList
 import com.example.pwdvault.view.popups.EnterMasterPwdPopup
 import com.example.pwdvault.view.popups.InputCredentialsPopup
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -136,6 +144,16 @@ fun PassManagerApp() {
     themeMode = remember { mutableStateOf(themeModeManager.getTheme()) }
 
     val masterPassword = remember { mutableStateOf<MasterPasswordDO?>(null) }
+    val searchQuery = remember { mutableStateOf("") }
+
+    fun refreshCredentialsList() {
+        credentialsList.value = credentialsManager.getAll(masterPassword.value)
+            .filter {
+                it.platform.contains(searchQuery.value, ignoreCase = true) ||
+                it.emailUsername.contains(searchQuery.value, ignoreCase = true)
+            }
+    }
+
     var toEdit: CredentialDO? = null
     val ctx = LocalContext.current
     val scope = CoroutineScope(Dispatchers.IO)
@@ -144,11 +162,11 @@ fun PassManagerApp() {
     PassManagerTheme(
         darkTheme = themeMode.value == ThemeModeDO.DARK
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) {
+        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .fillMaxHeight(),
+                    .padding(innerPadding),
                 verticalArrangement = Arrangement.Top
             ) {
                 TopBar(
@@ -157,12 +175,10 @@ fun PassManagerApp() {
                         val intent = Intent(ctx, SettingsActivity::class.java)
                         ContextCompat.startActivity(ctx, intent, null)
                     },
-                    search = { keyword ->
-                        credentialsList.value = credentialsManager.getAll(masterPassword.value)
-                            .filter {
-                                it.platform.contains(keyword, ignoreCase = true) ||
-                                it.emailUsername.contains(keyword, ignoreCase = true)
-                            }
+                    searchQuery = searchQuery.value,
+                    onSearchQueryChange = { query ->
+                        searchQuery.value = query
+                        refreshCredentialsList()
                     }
                 )
                 ItemList(
@@ -191,12 +207,38 @@ fun PassManagerApp() {
                         }
                     }
                 )
-                AddPwdButton {
-                    if (isLocked.value) {
-                        showEnterMasterPwdPopup.value = true
-                    } else {
-                        showAddPassPopup.value = true
-                    }
+                
+                // Button Row - Add Password and Unlock
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp)
+                        .padding(bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    AddPwdButton(
+                        modifier = Modifier.weight(1f),
+                        onAddPwd = {
+                            if (isLocked.value) {
+                                showEnterMasterPwdPopup.value = true
+                            } else {
+                                showAddPassPopup.value = true
+                            }
+                        }
+                    )
+                    UnlockButton(
+                        isLocked = isLocked.value,
+                        onUnlock = {
+                            if (isLocked.value) {
+                                showEnterMasterPwdPopup.value = true
+                            } else {
+                                isLocked.value = true
+                                masterPassword.value = null
+                                refreshCredentialsList()
+                            }
+                        }
+                    )
                 }
 
                 // Popups
@@ -207,7 +249,7 @@ fun PassManagerApp() {
                                 credential,
                                 masterPassword.value!!
                             )
-                            credentialsList.value = credentialsManager.getAll(masterPassword.value)
+                            refreshCredentialsList()
                             showAddPassPopup.value = false
                             scope.launch { credentialsManager.saveCredToFile() }
                         },
@@ -231,8 +273,7 @@ fun PassManagerApp() {
                                     masterPassword.value!!
                                 )
                                 toEdit = null
-                                credentialsList.value =
-                                    credentialsManager.getAll(masterPassword.value)
+                                refreshCredentialsList()
                                 showEditCredentialsPopup.value = false
                                 scope.launch { credentialsManager.saveCredToFile() }
                             },
@@ -250,7 +291,7 @@ fun PassManagerApp() {
                                     isLocked.value = false
                                     masterPassword.value = it
                                     showEnterMasterPwdPopup.value = false
-                                    credentialsList.value = credentialsManager.getAll(masterPassword.value)
+                                    refreshCredentialsList()
                                 } catch (e: SecurityException) {
                                     showEnterMasterPwdPopup.value = false
                                 }

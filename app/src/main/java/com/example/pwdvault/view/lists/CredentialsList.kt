@@ -2,6 +2,7 @@ package com.example.pwdvault.view.lists
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +19,7 @@ import com.example.pwdvault.dal.domain.CredentialDO
 
 
 @Composable
-fun ItemList(
+fun ColumnScope.ItemList(
     list: MutableState<List<CredentialDO>>,
     unlock: () -> Unit,
     delete: (platform: String, email: String) -> Unit,
@@ -27,7 +28,7 @@ fun ItemList(
     val boxPadding = 16.dp
     Box(
         modifier = Modifier
-            .fillMaxHeight(0.85f)
+            .weight(1f)
             .padding(boxPadding),
         contentAlignment = Alignment.TopStart
     ) {
