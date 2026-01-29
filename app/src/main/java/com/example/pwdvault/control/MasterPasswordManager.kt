@@ -9,15 +9,12 @@ import com.example.pwdvault.dal.saveToFile
 import java.io.File
 
 class MasterPasswordManager (
-    private val storageManager: Storage<Int, MasterPasswordDT>,
-    private val file: File
+    private val storageManager: Storage<Int, MasterPasswordDT>
 ) {
 
     private val defaultMasterPwd = "123"
 
     init {
-        // Check if the file exists and create it if it doesn't
-        if (!file.exists()) file.createNewFile()
         // Check if the master password is empty
         if (storageManager.retrieveAll().isEmpty()) {
             storageManager.store(MasterPasswordMapper.toDTO(
@@ -47,9 +44,5 @@ class MasterPasswordManager (
 
     private fun hash(password: String): String {
         return HashingManager.hashString(password)
-    }
-
-    fun saveMPToFile() {
-        saveToFile(file, storageManager.retrieveAll())
     }
 }

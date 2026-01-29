@@ -20,7 +20,7 @@ class MasterPasswordManagerTest {
     fun setup() {
         file = File.createTempFile("temp", null)
         storageManager = StorageJSON { a, b -> a.password == b.password }
-        masterPasswordManager = MasterPasswordManager(storageManager, file)
+        masterPasswordManager = MasterPasswordManager(storageManager)
     }
 
     @Test

@@ -17,9 +17,8 @@ class ThemeModeManagerTest {
 
     @Before
     fun setup() {
-        file = File.createTempFile("theme", "json")
         storage = StorageJSON { a, b -> a.theme == b.theme }
-        themeModeManager = ThemeModeManager(storage, file)
+        themeModeManager = ThemeModeManager(storage)
     }
 
     @Test
@@ -31,7 +30,7 @@ class ThemeModeManagerTest {
     @Test
     fun retrievesStoredTheme() {
         val darkTheme = ThemeModeDO.DARK
-        storage.store(ThemeModeMapper.toDTO(darkTheme))
+        themeModeManager.setTheme(darkTheme)
         val theme = themeModeManager.getTheme()
         assertEquals(darkTheme, theme)
     }
@@ -52,14 +51,5 @@ class ThemeModeManagerTest {
         themeModeManager.setTheme(darkTheme)
         val theme = themeModeManager.getTheme()
         assertEquals(darkTheme, theme)
-    }
-
-    @Test
-    fun savesThemeToFile() {
-        val darkTheme = ThemeModeDO.DARK
-        themeModeManager.setTheme(darkTheme)
-        themeModeManager.saveTMToFile()
-        val fileContent = file.readText()
-        assertEquals("[{\"theme\":\"DARK\"}]", fileContent)
     }
 }

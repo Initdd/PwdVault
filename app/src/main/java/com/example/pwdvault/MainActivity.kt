@@ -26,7 +26,7 @@ import androidx.core.content.ContextCompat
 import com.example.pwdvault.control.CredentialsManager
 import com.example.pwdvault.control.MasterPasswordManager
 import com.example.pwdvault.control.ThemeModeManager
-import com.example.pwdvault.dal.StorageJSON
+import com.example.pwdvault.dal.StorageSP
 import com.example.pwdvault.dal.domain.CredentialDO
 import com.example.pwdvault.dal.domain.MasterPasswordDO
 import com.example.pwdvault.dal.domain.ThemeModeDO
@@ -38,6 +38,7 @@ import com.example.pwdvault.dal.dto.compareMasterPasswordDT
 import com.example.pwdvault.dal.dto.compareThemeModeDT
 import com.example.pwdvault.dal.loadFromFile
 import com.example.pwdvault.ui.theme.PassManagerTheme
+import kotlinx.serialization.builtins.ListSerializer
 import com.example.pwdvault.view.bars.TopBar
 import com.example.pwdvault.view.buttons.AddPwdButton
 import com.example.pwdvault.view.buttons.UnlockButton
@@ -73,29 +74,41 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        // Files
+        // Files for migration and export/import
         val credentialFile = applicationContext.getFileStreamPath(CREDENTIALS_FILE_PATH)
         val themeFile = applicationContext.getFileStreamPath(THEME_FILE_PATH)
         val masterPasswordFile = applicationContext.getFileStreamPath(MASTER_PASSWORD_FILE_PATH)
-        // Check if files exist and create them if they don't
-        if (!credentialFile.exists()) credentialFile.createNewFile()
-        if (!themeFile.exists()) themeFile.createNewFile()
-        if (!masterPasswordFile.exists()) masterPasswordFile.createNewFile()
 
-        // Storages
-        val credentialStorage = StorageJSON<CredentialDT> { a, b -> compareCredentialDT(a, b) }
-        val themeStorage = StorageJSON<ThemeModeDT> { a, b -> compareThemeModeDT(a, b) }
-        val masterPasswordStorage =
-            StorageJSON<MasterPasswordDT> { a, b -> compareMasterPasswordDT(a, b) }
+        // Storages (Shared Preferences)
+        val credentialStorage = StorageSP<CredentialDT>(applicationContext, "credentials_prefs", ListSerializer(CredentialDT.serializer())) { a, b -> compareCredentialDT(a, b) }
+        val themeStorage = StorageSP<ThemeModeDT>(applicationContext, "theme_prefs", ListSerializer(ThemeModeDT.serializer())) { a, b -> compareThemeModeDT(a, b) }
+        val masterPasswordStorage = StorageSP<MasterPasswordDT>(applicationContext, "master_password_prefs", ListSerializer(MasterPasswordDT.serializer())) { a, b -> compareMasterPasswordDT(a, b) }
 
-        // Load data from files
-        credentialStorage.load(loadFromFile<CredentialDT>(credentialFile))
-        themeStorage.load(loadFromFile<ThemeModeDT>(themeFile))
-        masterPasswordStorage.load(loadFromFile<MasterPasswordDT>(masterPasswordFile))
+        // Migration logic
+        val sharedPrefs = getSharedPreferences("migration_prefs", MODE_PRIVATE)
+        val isMigrated = sharedPrefs.getBoolean("is_migrated", false)
+
+        if (!isMigrated) {
+            // Load from files if they exist and migration hasn't happened
+            if (credentialFile.exists()) {
+                val data = loadFromFile<CredentialDT>(credentialFile)
+                if (data.isNotEmpty()) credentialStorage.load(data)
+            }
+            if (themeFile.exists()) {
+                val data = loadFromFile<ThemeModeDT>(themeFile)
+                if (data.isNotEmpty()) themeStorage.load(data)
+            }
+            if (masterPasswordFile.exists()) {
+                val data = loadFromFile<MasterPasswordDT>(masterPasswordFile)
+                if (data.isNotEmpty()) masterPasswordStorage.load(data)
+            }
+            // Mark as migrated
+            sharedPrefs.edit().putBoolean("is_migrated", true).apply()
+        }
 
         // Managers
-        themeModeManager = ThemeModeManager(themeStorage, themeFile)
-        masterPasswordManager = MasterPasswordManager(masterPasswordStorage, masterPasswordFile)
+        themeModeManager = ThemeModeManager(themeStorage)
+        masterPasswordManager = MasterPasswordManager(masterPasswordStorage)
         credentialsManager = CredentialsManager(credentialStorage, credentialFile)
 
         super.onCreate(savedInstanceState)
@@ -108,8 +121,6 @@ class MainActivity : ComponentActivity() {
     // execute on exit
     private fun exit() {
         credentialsManager.saveCredToFile()
-        themeModeManager.saveTMToFile()
-        masterPasswordManager.saveMPToFile()
     }
 
     override fun onDestroy() {

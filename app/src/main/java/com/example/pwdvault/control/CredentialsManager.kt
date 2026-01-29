@@ -14,7 +14,7 @@ import java.io.File
 
 class CredentialsManager (
     private val storage: Storage<Int, CredentialDT>,
-    private val file: File,
+    private val defaultFile: File,
 ) {
 
     fun add(credentialDO: CredentialDO, masterPasswordDO: MasterPasswordDO): Boolean {
@@ -121,7 +121,7 @@ class CredentialsManager (
         return list.all { add(it, masterPasswordDO) }
     }
 
-    fun saveCredToFile(saveFile: File = file) {
+    fun saveCredToFile(saveFile: File = defaultFile) {
         saveToFile<CredentialDT>(saveFile, storage.retrieveAll())
     }
 

@@ -170,7 +170,6 @@ fun SettingsPage() {
                                 ThemeModeDO.LIGHT
                             }
                             themeModeManager.setTheme(themeMode.value)
-                            scope.launch { themeModeManager.saveTMToFile() }
                         }
                     }
                 }
@@ -244,7 +243,6 @@ fun SettingsPage() {
                         // Update the master password
                         masterPasswordManager.set(newMasterPassword)
                         credentialsManager.reencryptAll(oldMasterPassword, newMasterPassword)
-                        scope.launch { masterPasswordManager.saveMPToFile() }
                         // reset the decrypted state
                         isLocked.value = true
                         credentialsList.value = credentialsManager.getAll(null)
