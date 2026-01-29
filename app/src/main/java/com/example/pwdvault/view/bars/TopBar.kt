@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -43,7 +44,6 @@ fun TopBar(
     Box (
         modifier = Modifier
             .padding(16.dp)
-            .padding(top = 24.dp)
             .fillMaxWidth()
     ){
         Row(
